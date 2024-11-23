@@ -1,0 +1,413 @@
+{% extends 'inscricoes/consultar_inscricao_template.html' %}
+{% load static %}
+
+{% block step_load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+<style>
+    .table.is-hoverable tbody>tr:not(.is-selected):not(.detail):hover {
+        cursor: pointer;
+    }
+
+    .label {
+        font-weight: normal;
+    }
+
+    .menu-list .is-not-menu a.is-active {
+        background-color: white;
+        color: black;
+    }
+
+    ::placeholder {
+        opacity: 1;
+    }
+</style>
+{% endblock step_load %}
+
+{% block step_scripts %}
+<script src="{% static 'js/vue-dev.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/axios.js' %}"></script>
+<script src="{% static 'js/buefy/components/table/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/numberinput/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/datepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/select/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/input/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/menu/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/icon/index.min.js' %}"></script>
+
+<script>
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                moment,
+                jQuery,
+                atividades: [],
+                inscritos: JSON.parse("{{form.sessoes.value|default_if_none:'{}'|escapejs}}"),
+                init_inscritos: JSON.parse("{{form.sessoes.value|default_if_none:'{}'|escapejs}}"),
+                sessoesEscolhidas: JSON.parse("{{form.sessoes_info.value|default_if_none:'[]'|escapejs}}"),
+                total: 0,
+                loading: false,
+                sortField: 'dataalteracao',
+                sortOrder: 'desc',
+                page: 1,
+                perPage: 10,
+                filtros: {
+                    tipo: null,
+                    publicoalvo: null,
+                    nome: null,
+                },
+                filtros_id: {
+                    campus: null,
+                    unidade_organica: null,
+                    departamento: null,
+                },
+                sessao_dia: moment("{{ dia|default_if_none:'null' }}", "DD/MM/YYYY").format("YYYY-MM-DD"),
+                sessao_vagas: 0,
+                sessao_de: null,
+                sessao_ate: null,
+                campus: JSON.parse("{{campus|escapejs}}"),
+                unidades_organicas: JSON.parse("{{unidades_organicas|escapejs}}"),
+                departamentos: JSON.parse("{{departamentos|escapejs}}"),
+                tipos: JSON.parse("{{tipos|escapejs}}"),
+                publicos_alvo: JSON.parse("{{publicos_alvo|escapejs}}"),
+                nalunos: parseInt("{{nalunos}}"),
+            }
+        },
+        methods: {
+            loadAsyncData() {
+                let params = [
+                    `ordering=${this.sortOrder == 'desc' ? '-' : ''}${this.sortField}`,
+                    `page=${this.page}`,
+                    `page_size=${this.perPage}`,
+                ].join('&');
+
+                // Filtrar por string (e.g. Nome da Atividade)
+                for (filtro in this.filtros)
+                    if (this.filtros[filtro])
+                        params += `&${filtro}=${this.filtros[filtro]}`;
+
+                // Filtrar por id (e.g. Campus)
+                for (filtro in this.filtros_id)
+                    if (this.filtros_id[filtro])
+                        params += `&${filtro}_id=${this.filtros_id[filtro].id}`;
+
+                // Filtrar sessões por dia, vagas e hora
+                let dia = ''
+                let vagas = ''
+                let de = ''
+                let ate = ''
+                if (this.sessao_dia) dia = this.sessao_dia;
+                if (this.sessao_vagas) vagas = this.sessao_vagas;
+                if (this.sessao_de) de = moment(this.sessao_de).format('HH:mm');
+                if (this.sessao_ate) ate = moment(this.sessao_ate).format('HH:mm');
+                params += `&sessoes=${dia}_${vagas}_${de}_${ate}`;
+
+                const url = `{% url 'inscricoes:api-atividades' %}?${params}`;
+
+                this.loading = true;
+                axios.get(url)
+                    .then(response => {
+                        atividades = response.data;
+                        this.atividades = [];
+                        let currentTotal = atividades.count;
+                        if (atividades.count / this.perPage > 1000) {
+                            currentTotal = this.perPage * 1000;
+                        }
+                        this.total = currentTotal;
+                        atividades.results.forEach(atividade => {
+                            this.atividades.push(atividade);
+                        });
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        this.atividades = [];
+                        this.total = 0;
+                        this.loading = false;
+                        throw error;
+                    });
+            },
+            onPageChange(page) {
+                this.page = page
+                this.loadAsyncData()
+            },
+            onSort(field, order) {
+                this.sortField = field
+                this.sortOrder = order
+                this.loadAsyncData()
+            },
+            toggleDetails(row) {
+                this.$refs.table.toggleDetails(row);
+            },
+            closeOtherDetails(row) {
+                this.$refs.table.data.forEach(_row => {
+                    if (row.id != _row.id) this.$refs.table.closeDetailRow(_row);
+                });
+                // await new Promise(r => setTimeout(r, 1));
+                this.$refs.table.openDetailRow(row);
+            },
+            mudarInscritos(atividade, sessao) {
+                if (this.inscritos[sessao.id] === null)
+                    delete this.inscritos[sessao.id];
+                if (this.inscritos[sessao.id] <= 0) {
+                    index = this.sessoesEscolhidas.findIndex(obj => sessao.id === obj.sessao.id);
+                    if (index !== -1) this.sessoesEscolhidas.splice(index, 1);
+                    return;
+                }
+                info = {
+                    atividade: {
+                        nome: atividade.nome,
+                        sala: atividade.sala,
+                    },
+                    sessao: {
+                        id: sessao.id,
+                        vagas: sessao.vagas,
+                        horario: {
+                            inicio: sessao.horario.inicio,
+                            fim: sessao.horario.fim,
+                        }
+                    }
+                }
+                index = this.sessoesEscolhidas.findIndex(obj => sessao.id === obj.sessao.id);
+                if (index !== -1) this.sessoesEscolhidas[index] = info;
+                else this.sessoesEscolhidas.push(info);
+            },
+            sessaoFilter(sessoes) {
+                filtradas = sessoes.filter(sessao => sessao.dia == this.sessao_dia);
+                if (this.sessao_vagas)
+                    filtradas = filtradas.filter(sessao => sessao.vagas >= this.sessao_vagas);
+                if (this.sessao_de)
+                    filtradas = filtradas.filter(sessao => moment(sessao.horario.inicio, 'HH:mm:ss')
+                        .isSameOrAfter(moment(this.sessao_de, 'HH:mm')));
+                if (this.sessao_ate)
+                    filtradas = filtradas.filter(sessao => moment(sessao.horario.fim, 'HH:mm:ss')
+                        .isSameOrBefore(moment(this.sessao_ate, 'HH:mm')));
+                return filtradas;
+            },
+        },
+        mounted() {
+            this.loadAsyncData()
+        }
+    });
+</script>
+{% endblock step_scripts %}
+
+{% block step_content %}
+<div id="vue-app">
+    <input type="hidden" name="{{form.sessoes.name}}" :value="JSON.stringify(inscritos)">
+    <input type="hidden" name="{{form.sessoes_info.name}}" :value="JSON.stringify(sessoesEscolhidas)">
+    {% if alterar %}
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Sessões Disponíveis <abbr
+            title="Pode consultar nesta tabela todas as atividades disponíveis para inscrição e os seus horários. Deve selecionar as atividades que deseja para ver detalhes e escolher quantos alunos quer inscrever na sessão."><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div>
+        <div class="columns">
+            <!-- MENU LATERAL -->
+            <div class="column is-3">
+                <b-menu style="margin-bottom: 1rem">
+                    <b-menu-list label="Filtros Atividade">
+                        <b-field>
+                            <b-select id="campus" placeholder="Campus" expanded icon="magnify"
+                                v-model="filtros_id['campus']"
+                                @input="value => {if(value == 'Qualquer') { filtros_id['campus'] = ''; jQuery('select#campus').parent().addClass('is-empty'); } else jQuery('select#campus').parent().removeClass('is-empty'); this.loadAsyncData();}">
+                                <option disabled="disabled" value="" hidden="hidden">
+                                    Campus
+                                </option>
+                                <option>Qualquer</option>
+                                <option v-for="(opcao, index) in campus" :value="opcao" :key="index">
+                                    [[ opcao.nome ]]
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <b-field>
+                            <b-select id="unidade-organica" placeholder="Unidade Orgânica" expanded icon="magnify"
+                                v-model="filtros_id['unidade_organica']"
+                                @input="value => {if(value == 'Qualquer') {filtros_id['unidade_organica'] = ''; jQuery('select#unidade-organica').parent().addClass('is-empty'); } else jQuery('select#unidade-organica').parent().removeClass('is-empty'); this.loadAsyncData();}">
+                                <option disabled="disabled" value="" hidden="hidden">
+                                    Unidade Orgânica
+                                </option>
+                                <option>Qualquer</option>
+                                <option v-for="(opcao, index) in unidades_organicas" :value="opcao" :key="index">
+                                    [[ opcao.nome ]]
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <b-field>
+                            <b-select id="departamento" placeholder="Departamento" expanded icon="magnify"
+                                v-model="filtros_id['departamento']"
+                                @input="value => {if(value == 'Qualquer') { filtros_id['departamento'] = ''; jQuery('select#departamento').parent().addClass('is-empty'); } else jQuery('select#departamento').parent().removeClass('is-empty'); this.loadAsyncData();}">
+                                <option disabled="disabled" value="" hidden="hidden">
+                                    Departamento
+                                </option>
+                                <option>Qualquer</option>
+                                <option v-for="(opcao, index) in departamentos" :value="opcao" :key="index">
+                                    [[ opcao.nome ]]
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <b-field>
+                            <b-select id="tipo" placeholder="Tipo" expanded icon="magnify" v-model="filtros['tipo']"
+                                @input="value => {if(value == 'Qualquer') { filtros['tipo'] = ''; jQuery('select#tipo').parent().addClass('is-empty'); } else jQuery('select#tipox').parent().removeClass('is-empty'); this.loadAsyncData();}">
+                                <option disabled="disabled" value="" hidden="hidden">
+                                    Tipo
+                                </option>
+                                <option>
+                                    Qualquer
+                                </option>
+                                <option v-for="(opcao, index) in tipos" :value="opcao" :key="index">
+                                    [[ opcao ]]
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <b-field>
+                            <b-select id="publicoalvo" placeholder="Público Alvo" expanded icon="magnify"
+                                v-model="filtros['publicoalvo']"
+                                @input="value => {if(value == 'Qualquer') { filtros['publicoalvo'] = ''; jQuery('select#publicoalvo').parent().addClass('is-empty'); } else jQuery('select#publicoalvo').parent().removeClass('is-empty'); this.loadAsyncData();}">
+                                <option disabled="disabled" value="" hidden="hidden">
+                                    Tipo
+                                </option>
+                                <option>
+                                    Qualquer
+                                </option>
+                                <option v-for="(opcao, index) in publicos_alvo" :value="opcao" :key="index">
+                                    [[ opcao ]]
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <b-field>
+                            <b-input placeholder="Nome da Atividade" icon="magnify" v-model="filtros['nome']"
+                                @input="value => {this.loadAsyncData();}">
+                            </b-input>
+                        </b-field>
+                    </b-menu-list>
+                </b-menu>
+                <b-menu>
+                    <b-menu-list label="Filtros Sessão">
+                        <div class="columns" style="margin-bottom: 0">
+                            <b-field class="column" style="margin-bottom: 0">
+                                <b-timepicker placeholder="De" icon="clock" editable v-model="sessao_de"
+                                    @input="value => {this.loadAsyncData();}" :increment-minutes="5">
+                                </b-timepicker>
+                            </b-field>
+                            <b-field class="column">
+                                <b-timepicker placeholder="Até" icon="clock" editable v-model="sessao_ate"
+                                    @input="value => {this.loadAsyncData();}" :increment-minutes="5">
+                                </b-timepicker>
+                            </b-field>
+                        </div>
+                        <b-field label="Mínimo de vagas">
+                            <b-numberinput v-model="sessao_vagas" @input="value => {this.loadAsyncData();}"
+                                controls-position="compact" min="0" />
+                        </b-field>
+                    </b-menu-list>
+                </b-menu>
+            </div>
+            <!-- TABELA DISPONÍVEIS -->
+            <div class="column">
+                <b-table :data="atividades" :loading="loading" ref="table" hoverable detailed @click="toggleDetails"
+                    @page-change="onPageChange" @details-open="closeOtherDetails" backend-sorting
+                    :default-sort="[sortField, sortOrder]" @sort="onSort" sort-icon="menu-up" paginated
+                    backend-pagination :total="total" striped :per-page="perPage" aria-next-label="Next page"
+                    aria-previous-label="Previous page" aria-page-label="Page" aria-current-label="Current page">
+                    <template slot-scope="props">
+                        <b-table-column field="nome" label="Atividade" sortable>
+                            [[ props.row.nome ]]
+                        </b-table-column>
+                        <b-table-column field="tipo" label="Tipo" sortable>
+                            [[ props.row.tipo ]]
+                        </b-table-column>
+                        <b-table-column field="publicoalvo" label="Público Alvo" sortable>
+                            [[ props.row.publicoalvo ]]
+                        </b-table-column>
+                        <b-table-column field="campus" label="Campus" sortable>
+                            [[ props.row.campus ]]
+                        </b-table-column>
+                    </template>
+                    <template slot="detail" slot-scope="props">
+                        <div class="content">
+                            <div style="font-size: 15px">
+                                <p><strong>Descrição: </strong>[[ props.row.descricao ]]</p>
+                                {% comment %} <p><strong>Responsável:</strong> [[ props.row.creator ]]</p>
+                                {% endcomment %}
+                                <b-table :data="sessaoFilter(props.row.sessao_set)" sort-icon="menu-up"
+                                    default-sort="horario.inicio">
+                                    <template slot-scope="session_props">
+                                        <b-table-column field="horario.inicio" label="Horário" sortable>
+                                            [[ moment(session_props.row.horario.inicio,
+                                            "HH:mm:ss").format("HH:mm")
+                                            ]] -
+                                            [[ moment(session_props.row.horario.fim,
+                                            "HH:mm:ss").format("HH:mm") ]]
+                                        </b-table-column>
+                                        <b-table-column field="vagas" label="Vagas">
+                                            [[ init_inscritos[session_props.row.id] ? session_props.row.vagas +
+                                            init_inscritos[session_props.row.id] : session_props.row.vagas]]
+                                        </b-table-column>
+                                        <b-table-column label="Inscrever">
+                                            <b-field>
+                                                <b-numberinput class="no-margin-bottom"
+                                                    style="width: 10rem; margin-bottom: 0" controls-position="compact"
+                                                    min="0" :max="Math.min(session_props.row.vagas, nalunos)"
+                                                    v-model="inscritos[session_props.row.id]"
+                                                    @input="mudarInscritos(props.row, session_props.row)" />
+                                            </b-field>
+                                        </b-table-column>
+                                    </template>
+                                </b-table>
+                            </div>
+                        </div>
+                    </template>
+                </b-table>
+            </div>
+        </div>
+    </div>
+    <hr />
+    {% endif %}
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Sessões Escolhidas <abbr
+            title="Aqui pode consultar a lista das sessões que escolheu inscrever-se. Se pretender remover a inscrição clique na cruz vermelha à direita da sessão."><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <!-- TABELA ESCOLHIDAS -->
+    <b-table :data="sessoesEscolhidas" sort-icon="menu-up" default-sort="sessao.horario.inicio">
+        <template slot-scope="props">
+            <b-table-column field="sessao.horario.inicio" label="Horário" width="200" sortable>
+                [[ moment(props.row.sessao.horario.inicio, "HH:mm:ss").format("HH:mm") ]] -
+                [[ moment(props.row.sessao.horario.fim, "HH:mm:ss").format("HH:mm") ]]</b-table-column>
+            <b-table-column label="Inscritos" width="160">
+                {% if alterar %}
+                <b-field>
+                    <b-numberinput v-model="inscritos[props.row.sessao.id]" min="0"
+                        :max="Math.min(props.row.sessao.vagas, nalunos)" style="width: 10rem"
+                        controls-position="compact" @blur="mudarInscritos(props.row.atividade, props.row.sessao)" />
+                </b-field>
+                {% else %}
+                <input type="text" style="max-width:70px" class="input" readonly
+                    :value="inscritos[props.row.sessao.id]">
+                {% endif %}
+            </b-table-column>
+            <b-table-column field="atividade.nome" label="Atividade">
+                [[ props.row.atividade.nome ]]
+            </b-table-column>
+            <b-table-column field="atividade.sala" label="Sala">
+                <span v-html="props.row.atividade.sala"></span>
+            </b-table-column>
+            {% if alterar %}
+            <b-table-column label="Ações" centered>
+                <a @click="inscritos[props.row.sessao.id] = 0; mudarInscritos(props.row.atividade, props.row.sessao)">
+                    <b-icon icon="close-box" type="is-danger" /></a>
+            </b-table-column>
+            {% endif %}
+        </template>
+        <template slot="empty">
+            <p class="has-text-grey">Ainda não há sessões escolhidas</p>
+        </template>
+    </b-table>
+</div>
+{% endblock step_content %}

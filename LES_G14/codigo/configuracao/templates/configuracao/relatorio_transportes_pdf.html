@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+{% load static %}
+{% load inscricoes_extras %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Presenças - Universidade</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 2cm;
+
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 50pt;
+                width: 772pt; /* Adjusted for landscape */
+                top: 512pt; /* Adjusted for landscape */
+                height: 20pt;
+            }
+        }
+
+        .section-header {
+            text-align: center;
+            padding: 3px;
+            padding-top: 10px;
+            background-color: #eee;
+            border: 1px solid #000;
+            font-weight: bold;
+        }
+
+        .has-text-centered {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="footer_content">Relatório de Transportes - página <pdf:pagenumber> de <pdf:pagecount></div>
+    <img src="{{ 'img/ualg-logo.png'|get64 }}" alt="Ualg Logo" height="100">
+    <img class="has-text-centered" src="{{ 'img/logo-large.png'|get64 }}" alt="Dia Aberto Logo" height="100">
+    <pdf:spacer height="20px" />  
+    
+    <h1 class="has-text-centered">Relatório de Transportes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nº Autocarro</th>
+                {% comment %} <th>Escola</th>
+                <th>Localidade</th>
+                <th>Número de Alunos</th>
+                <th>Número de Docentes</th> {% endcomment %}
+                <th>Hora Partida</th>
+                <th>Hora Chegada</th>
+                <th>Origem</th>
+                <th>Dia</th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for transporte in Transportes %}
+            <tr>
+                <td>{{ transporte.transporte.identificador}}</td>
+                <td>{{ transporte.horaPartida }}</td>
+                <td>{{ transporte.horaChegada }}</td>
+                <td>{{ transporte.origem }}</td>
+                <td>{{ transporte.transporte.dia }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

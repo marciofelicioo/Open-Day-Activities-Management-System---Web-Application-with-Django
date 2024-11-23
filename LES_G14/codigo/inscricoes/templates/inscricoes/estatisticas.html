@@ -1,0 +1,402 @@
+{% extends 'app.html' %}
+{% load inscricoes_extras %}
+{% load static %}
+
+{% block title %}- Estatísticas{% endblock title %}
+
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/Chart.min.css' %}">
+{% endblock load %}
+
+{% block scripts %}
+<script src="{% static 'js/Chart.min.js' %}"></script>
+<script>
+
+    function selectDiaAberto(selectObject) {
+        const value = selectObject.value;
+        location.href = "{% url 'inscricoes:estatisticas' 12345 %}".replace(/12345/, value);
+    }
+
+    const anos = [{% for diaaberto in diasabertos reversed %}{{diaaberto.ano}}, {% endfor %}];
+    const participates_por_ano = [{% for diaaberto in diasabertos reversed %}{{diaaberto|nparticipantes}}, {% endfor %}];
+    const ctx_nparticipantes = document.getElementById('nparticipantes').getContext('2d');
+    const chart_nparticipantes = new Chart(ctx_nparticipantes, {
+        type: 'line',
+        data: {
+            labels: anos,
+            datasets: [{
+                label: "Número de participantes",
+                backgroundColor: "rgba(255, 50, 90, 0.6)",
+                borderColor: "rgba(255, 50, 90, 0.6)",
+                data: participates_por_ano,
+                fill: false,
+                pointRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Número de Participantes nos Dias Abertos',
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            legend: {
+                display: false,
+            },
+        }
+    });
+
+    const inscricoes_individuais_por_ano = [{% for diaaberto in diasabertos reversed %}{{diaaberto|ninscricoesindividuais}}, {% endfor %}];
+    const inscricoes_escola_por_ano = [{% for diaaberto in diasabertos reversed %}{{diaaberto|ninscricoesescola}}, {% endfor %}];
+    const ctx_tiposinscricao = document.getElementById('tiposinscricao').getContext('2d');
+    const chart_tiposinscricao = new Chart(ctx_tiposinscricao, {
+        type: 'bar',
+        data: {
+            labels: anos,
+            datasets: [{
+                backgroundColor: 'rgba(225, 10, 20, 0.6)',
+                label: 'Participantes de inscrição individual',
+                data: inscricoes_individuais_por_ano,
+            }, {
+                backgroundColor: 'rgba(100, 100, 200, 0.8)',
+                label: 'Participantes de inscrição de escola (turma)',
+                data: inscricoes_escola_por_ano,
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+        },
+    });
+
+    const departamentos = [{% for departamento in departamentos %}"{{departamento.nome}}", {% endfor %}];
+    const departamentos_cores = [{% for departamento in departamentos %}'rgba('+({{ forloop.counter }}*91)%255+','+({{ forloop.counter }}*140)%255+','+({{ forloop.counter }}*199)%255+',0.6)', {% endfor %}];
+    const atividades_por_departamento = [{% for departamento in departamentos %}{{departamento|atividadesdepartamento}}, {% endfor %}];
+    const ctx_atividades_por_departamento = document.getElementById('atividades-por-departamento').getContext('2d');
+    const chart_atividades_por_departamento = new Chart(ctx_atividades_por_departamento, {
+        type: 'polarArea',
+        data: {
+            labels: departamentos,
+            datasets: [{
+                label: 'Atividades por departamentos',
+                backgroundColor: departamentos_cores,
+                data: atividades_por_departamento,
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Número de Atividades por Departamento',
+            },
+            legend: {
+                position: 'right',
+            },
+        },
+    });
+
+    const sessoes_por_dia = [{% for dia in dias %}{{dia|sessoesdia}}, {% endfor %}]
+    const dias = [{% for dia in dias %}"{{dia}}", {% endfor %}]
+    const ctx_sessoes_por_dia = document.getElementById('sessoes-por-dia').getContext('2d');
+    const chart_sessoes_por_dia = new Chart(ctx_sessoes_por_dia, {
+        type: 'line',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Nº de sessões por dia',
+                backgroundColor: 'rgba(255, 180, 0, 0.24)',
+                data: sessoes_por_dia,
+            }]
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+        },
+    });
+
+    const vagas_por_dia = [{% for dia in dias %}{{dia|vagasdia}}, {% endfor %}]
+    const inscritossessoes_por_dia = [{% for dia in dias %}{{dia|inscritossessoesdia}}, {% endfor %}]
+    const ctx_vagas_por_dia = document.getElementById('vagas-por-dia').getContext('2d');
+    const chart_vagas_por_dia = new Chart(ctx_vagas_por_dia, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Nº inscrições em sessões por dia',
+                backgroundColor: 'rgba(0, 0, 240, 0.6)',
+                data: inscritossessoes_por_dia,
+            },
+            {
+                label: 'Nº vagas em sessões por dia',
+                backgroundColor: 'rgba(100, 100, 255, 0.4)',
+                data: vagas_por_dia,
+            }]
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                xAxes: [{ stacked: true }],
+                yAxes: [{ stacked: true }]
+            },
+        },
+    });
+
+    const inscritos_individuais_por_dia = [{% for dia in dias %}{{dia|inscritosindividuaisdia}}, {% endfor %}]
+    const inscritos_escola_por_dia = [{% for dia in dias %}{{dia|inscritosescoladia}}, {% endfor %}]
+    const ctx_inscritos_por_dia = document.getElementById('inscritos-por-dia').getContext('2d');
+    const chart_inscritos_por_dia = new Chart(ctx_inscritos_por_dia, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: [{
+                backgroundColor: 'rgba(225, 10, 20, 0.6)',
+                label: 'Participantes de inscrição individual',
+                data: inscritos_individuais_por_dia,
+            }, {
+                backgroundColor: 'rgba(50, 150, 50, 0.6)',
+                label: 'Participantes de inscrição de escola (turma)',
+                data: inscritos_escola_por_dia,
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+        },
+    });
+
+    const transportes_por_dia = [{% for dia in dias %}{{dia|transportesdia}}, {% endfor %}]
+    const ctx_transportes_por_dia = document.getElementById('transportes-por-dia').getContext('2d');
+    const chart_transportes_por_dia = new Chart(ctx_transportes_por_dia, {
+        type: 'line',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Nº de participantes de transportes públicos por dia',
+                backgroundColor: 'rgba(255, 191, 184, 0.8)',
+                data: transportes_por_dia,
+            }]
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+        },
+    });
+
+    const meios = [{% for _, meio in meios %}"{{meio}}", {% endfor %}];
+    const meios_cores = [{% for meio in meios %}'rgba('+({{ forloop.counter }}*401)%255+','+({{ forloop.counter }}*591)%255+','+({{ forloop.counter }}*222)%255+',0.6)', {% endfor %}];
+    const inscritos_por_meio = [{% for value, meio in meios %}{{value|inscritosmeio:diaaberto}}, {% endfor %}];
+    const ctx_inscritos_por_meio = document.getElementById('inscritos-por-meio').getContext('2d');
+    const chart_inscritos_por_meio = new Chart(ctx_inscritos_por_meio, {
+        type: 'doughnut',
+        data: {
+            labels: meios,
+            datasets: [{
+                backgroundColor: meios_cores,
+                data: inscritos_por_meio,
+            }]
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'left',
+            },
+        },
+    });
+
+    const almocos_alunos_por_dia = [{% for dia in dias %}{{dia|almocosalunosdia}}, {% endfor %}]
+    const almocos_docentes_por_dia = [{% for dia in dias %}{{dia|almocosdocentesdia}}, {% endfor %}]
+    const ctx_almocos_por_dia = document.getElementById('almocos-por-dia').getContext('2d');
+    const chart_almocos_por_dia = new Chart(ctx_almocos_por_dia, {
+        type: 'bar',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Nº pratos para estudantes por dia',
+                backgroundColor: 'rgba(100, 10, 240, 0.6)',
+                data: almocos_alunos_por_dia,
+            },
+            {
+                label: 'Nº pratos para não estudantes por dia',
+                backgroundColor: 'rgba(255, 50, 50, 0.7)',
+                data: almocos_docentes_por_dia,
+            }]
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                xAxes: [{ stacked: true }],
+                yAxes: [{ stacked: true }]
+            },
+        },
+    });
+
+    const almocam_penha = {{diaaberto|almocampenha}};
+    const almocam_gambelas = {{diaaberto|almocamgambelas}};
+    const almocam_fora = {{diaaberto|nparticipantes}} - almocam_penha - almocam_gambelas;
+    const ctx_almocam_onde = document.getElementById('almocam-onde').getContext('2d');
+    const chart_almocam_onde = new Chart(ctx_almocam_onde, {
+        type: 'pie',
+        data: {
+            labels: ["Almoçam na Penha", "Almoçam em Gambelas", "Almoçam fora"],
+            datasets: [{
+                backgroundColor: [
+                    "rgba(50,200,50, 0.6)",
+                    "rgba(255,40,100, 0.6)",
+                    "rgba(120,120,120, 0.3)",
+                ],
+                data: [
+                    almocam_penha,
+                    almocam_gambelas,
+                    almocam_fora,
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'left',
+            },
+        },
+    });
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a href="">Dados e Estatísticas</a></li>
+        </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem;">
+        <h2 class="title has-text-grey is-uppercase has-text-centered" style="font-size: 0.9rem">
+            Informações dos Dias Abertos
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <canvas id="nparticipantes"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="tiposinscricao"></canvas>
+            </div>
+        </div>
+        <hr>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Dia Aberto</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <p class="control">
+                        <div class="select">
+                            <select value="{{diaaberto.id}}" onchange="selectDiaAberto(this)">
+                                {% for dia_aberto in diasabertos %}
+                                <option value="{{dia_aberto.id}}" {% if diaaberto.id == dia_aberto.id %}selected{% endif %}>{{dia_aberto}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <h2 class="title has-text-grey is-uppercase has-text-centered" style="font-size: 0.9rem">
+            Atividades do Dia Aberto {{diaaberto.ano}}
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <canvas id="atividades-por-departamento"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="sessoes-por-dia"></canvas>
+            </div>
+        </div>
+        <hr>
+        <h2 class="title has-text-grey is-uppercase has-text-centered" style="font-size: 0.9rem">
+            Inscrições no Dia Aberto {{diaaberto.ano}}
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <canvas id="vagas-por-dia"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="inscritos-por-dia"></canvas>
+            </div>
+        </div>
+        <hr>
+        <h2 class="title has-text-grey is-uppercase has-text-centered" style="font-size: 0.9rem">
+            Informações dos transportes {{diaaberto.ano}}
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <canvas id="transportes-por-dia"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="inscritos-por-meio"></canvas>
+            </div>
+        </div>
+        <hr>
+        <h2 class="title has-text-grey is-uppercase has-text-centered" style="font-size: 0.9rem">
+            Informações dos almoços {{diaaberto.ano}}
+        </h2>
+        <div class="columns">
+            <div class="column">
+                <canvas id="almocos-por-dia"></canvas>
+            </div>
+            <div class="column">
+                <canvas id="almocam-onde"></canvas>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+{% endblock content %}

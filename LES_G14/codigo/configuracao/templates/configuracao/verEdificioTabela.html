@@ -1,0 +1,25 @@
+{% extends 'bulma_table_details.html' %}
+
+
+{% block details_content %}
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>Sala</th>
+            <th>Andar</th>
+            <th>Descrição</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for sala in row.record.salas_ %}
+        <tr>
+            <td data-label="Sala">{{sala}}</td>
+            <td data-label="Andar">{{sala.andar}}</td>
+            <td data-label="Descrição">{{sala.descricao|default_if_none:"--"}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock details_content %}

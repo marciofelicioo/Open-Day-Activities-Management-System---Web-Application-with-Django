@@ -1,0 +1,96 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load django_tables2 %}
+<div class="columns">
+       <div class="column is-3">
+        <form method="get">
+            <div class="menu">
+                <p class="menu-label">Filtros Atividades</p>
+                <ul class="menu-list">
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.tipo.name }}"
+                                    value="{{filter.form.tipo.value}}">
+                                    <option value="" >Qualquer Tipo</option>
+                                    <option value="Tertulia" {% if filter.form.tipo.value == 'Tertulia' %}selected{% endif %}>Tertulia</option>
+                                    <option value="Palestra" {% if filter.form.tipo.value == 'Palestra' %}selected{% endif %}>Palestra</option>
+                                    <option value="Atividade Laboratorial" {% if filter.form.tipo.value == 'Atividade Laboratorial' %}selected{% endif %}>Atividade Laboratorial</option>
+                                </select>
+                            </div>
+                            
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                            
+                        </div>
+                    </div>
+                
+                    <div class="field">
+                        <!---->
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_nome' type='text' name='nome' value="{{filter.form.nome.value|default_if_none:''}}" placeholder="Nome">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                    <div class="field">
+                        <label>Estado:</label>
+                    </div>
+                    <li>
+                        {{filter.form.estado}}
+                    </li>
+                </ul>
+                <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <a type="button" role="button" href="{% url 'atividades:minhasAtividades' %}" class="button is-light is-fullwidth">Limpar</a>
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                </div>
+            </div>     
+        </form>
+       
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+              <li><a href="#">Início</a></li>
+              <li class="is-active"><a href="#" aria-current="page">Atividades</a></li>
+            </ul>
+          </nav>
+        <a href="{% url 'atividades:proporAtividade' %}" class="button is-success is-outlined" type="button" style="margin-bottom:0.5rem">
+            <span class="icon is-small">
+                <i class="mdi mdi-plus"></i>
+            </span>
+            <span>Propor nova atividade</span>
+        </a>
+        {% render_table table 'atividades/tabelaprof.html' %}
+    </div>
+
+<style>
+.dialog .modal-card .modal-card-body.is-titleless {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+tr.detail{
+    padding:1rem;
+}
+.table tr.detail{
+    -webkit-box-shadow:inset 0 1px 3px #dbdbdb;
+    box-shadow:inset 0 1px 3px #dbdbdb;
+    background:#fafafa
+}
+</style>
+{% endblock content %}
+{% block scripts%}
+{% endblock scripts%}

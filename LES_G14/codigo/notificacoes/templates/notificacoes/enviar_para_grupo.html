@@ -1,0 +1,184 @@
+{% extends 'app.html' %}
+
+{% block title %}Enviar Notificação{% endblock title %}
+
+{% block content %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a>Mensagens</a></li>
+        </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem;">
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-account"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Escolher Tipo</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="step-details">
+
+                    <p class="step-title">Escrever Mensagem</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="columns">
+            <div class="column is-3">
+            </div>
+            <div class="column">
+                <div style="padding: 3rem 2vw 1rem;">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Título</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" name="titulo" class="input" id="id_titulo"
+                                            value="{{form.titulo.value|default_if_none:"" }}"
+                                            placeholder="Insira o título da mensagem">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Mensagem</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <textarea class="textarea" name="mensagem" 
+                                            placeholder="Insira a mensagem a enviar">{{form.mensagem.value|default_if_none:"" }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Tipo de utilizador</label>
+                            </div>
+                            <div class="field-body is-expanded">
+                                <div class="field">
+                                    <div class="control">
+                                        <span class="select">
+                                            {{form_group.filtro_tipo}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="field is-horizontal" style="margin-left:22%; margin-top:5%">
+                            <div class="field-label">
+                                <!-- Left empty for spacing -->
+                            </div>
+                            <div class="field-body">
+                                <div class="field is-grouped">
+                                    <p class="control">
+                                        <a href="{% url 'notificacoes:enviar-notificacao' %}" class="button is-light">
+                                            Voltar
+                                        </a>
+                                    </p>
+                                    <button style="" type="submit" class="button is-success is-outlined">
+                                        <span>Confirmar</span>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                    {% if msg %}
+                    <div style="margin-top:5%;text-align:center;position:center;">
+                        <article class="message is-danger">
+                            <div class="message-body">
+                                <p style="text-align: center;">
+
+                                    {% if form.non_field_errors %}
+                                    {% for error in form.non_field_errors %}
+                                    <p style="color: #ff0000; text-align:center">{{error}}</p>
+                                    {% endfor %}
+                                    {% else %}
+
+                                    {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <p style="color: #ff0000;">{{ error }}</p>
+                                    {% endfor %}
+                                    {% endfor %}
+                                    {%endif%}
+
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="column is-3">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

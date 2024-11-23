@@ -1,0 +1,33 @@
+    <tr>
+        <input type="hidden" name="{{form_id}}" id="id_{{form_id}}">
+        <td data-label="Origem">
+            <span class="select is-fullwidth is-empty">
+                <select type="text" name="{{form_origem}}" class="input" maxlength="32" id="id_{{form_origem}}">
+                    <option value="" selected="">---------</option>
+                    <option value="Penha">Penha</option>
+                    <option value="Terminal">Terminal</option>
+                    <option value="Gambelas">Gambelas</option>
+                </select>
+            </span>
+        </td>
+    
+        <td data-label="Chegada">
+            <span class="select is-fullwidth is-empty">
+                <select type="text" name="{{form_chegada}}" class="input" maxlength="32" id="id_{{form_chegada}}">
+                    <option value="" selected="">---------</option>
+                    <option value="Penha">Penha</option>
+                    <option value="Terminal">Terminal</option>
+                    <option value="Gambelas">Gambelas</option>
+                </select>
+            </span>
+        </td>
+    
+        <td data-label="HoraPartida">
+            <input type="time" name="{{form_horaPartida}}" class="input" id="id_{{form_horaPartida}}">
+        </td>
+    
+        <td data-label="HoraChegada">
+            <input type="time" name="{{form_horaChegada}}" class="input" id="id_{{form_horaChegada}}">
+        </td>
+
+    </tr>

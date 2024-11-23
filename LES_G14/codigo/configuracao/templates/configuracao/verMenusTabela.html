@@ -1,0 +1,25 @@
+{% extends 'bulma_table_details.html' %}
+
+
+{% block details_content %}
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>Prato</th>
+            <th>Tipo</th>
+            <th># Pratos</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for prato in row.record.pratos_ %}
+        <tr>
+            <td data-label="Prato">{{prato}}</td>
+            <td data-label="Tipo">{{prato.tipo}}</td>
+            <td data-label="# Pratos">{{prato.nrpratosdisponiveis}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock details_content %}

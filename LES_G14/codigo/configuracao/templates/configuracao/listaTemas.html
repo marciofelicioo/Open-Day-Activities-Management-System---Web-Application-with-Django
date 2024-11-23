@@ -1,0 +1,59 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load l10n %}
+{% load configuracao_tags %}
+{% load django_tables2 %}
+<div class="columns">
+    <div class="column is-3">
+        <form method="get">
+            <div class="menu">
+                <p class="menu-label">Filtros Tema</p>
+                <ul class="menu-list">
+                    <div class="field">
+                        <!---->
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_tema' type='text' name='tema' value="{{filter.form.tema.value|default_if_none:''}}" placeholder="Nome">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                </ul>
+                <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <a type="button" class="button is-light is-fullwidth" role="button" href="{% url 'configuracao:verTemas' %}">Limpar</a>
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                </div>
+            </div>     
+        </form>
+
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+              <li><a href="{% url 'home' %}">Início</a></li>
+              <li class="is-active"><a href="#" aria-current="page">Temas</a></li>
+            </ul>
+          </nav>
+        <a class="button is-success is-outlined" type="button" style="margin-bottom:0.5rem" href="{% url 'configuracao:adicionarTema'%}">     
+            <span class="icon is-small">
+                <i class="mdi mdi-plus"></i>
+            </span>
+            <span>Configurar tema</span>
+        </a>   
+
+        {% render_table table %}
+    </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}

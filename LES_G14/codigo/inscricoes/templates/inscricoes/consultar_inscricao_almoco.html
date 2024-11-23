@@ -1,0 +1,127 @@
+{% extends 'inscricoes/consultar_inscricao_template.html' %}
+{% load static %}
+
+{% block step_load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{% endblock step_load %}
+
+{% block step_scripts %}
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/buefy/components/numberinput/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+
+<script>
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                npratosalunos: parseInt("{{ form.npratosalunos.value|default_if_none:'0' }}"),
+                npratosdocentes: parseInt("{{ form.npratosdocentes.value|default_if_none:'0' }}"),
+                nalunos: parseInt("{{ nalunos|default_if_none:'0' }}"),
+            }
+        },
+        computed: {
+            nresponsaveis: () => {
+                const individual = "{{ individual }}" == "True";
+                let nresponsaveis = 0;
+                if (individual)
+                    nresponsaveis = parseInt("{{ nalunos|default_if_none:'0' }}");
+                else
+                    nresponsaveis = parseInt("{{ nresponsaveis|default_if_none:'0' }}");
+                return nresponsaveis;
+            },
+        },
+    });
+</script>
+{% endblock step_scripts %}
+
+{% block step_content %}
+<div id="vue-app">
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Informação de Menu <abbr
+            title="Pode consultar aqui os menus dos almoços nos diferentes campi da universidade"><span class="icon"
+                style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <table class="table is-bordered is-fullwidth">
+        <thead>
+            <tr>
+                <th></th>
+                {% for campus in campi %}
+                <th class="has-text-centered">{{campus}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <thead>
+            {% for tipo, campi_tipo in pratos_info.items %}
+            <tr>
+                <td class="has-text-right"><strong>{{tipo}}</strong></td>
+                {% for campus, pratos in campi_tipo.items %}
+                <td>
+                    {% if pratos %}
+                    {{pratos|join:' / '}}
+                    {% else %}
+                    ---
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </thead>
+    </table>
+    <hr />
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Inscrição de almoços <abbr
+            title="Deve selecionar qual o campus onde pretende almoçar e o número de alunos e docentes que pretendem almoço. Deixe 0 caso ninguém pretenda almoço."><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div class="columns">
+        <div class="column is-5">
+            <div class="field">
+                <label for="{{ form.campus.id_for_label }}" class="label">{{ form.campus.label }}</label>
+                {% if alterar %}
+                <div class="control">
+                    <div class="select is-primary is-fullwidth">
+                        {{ form.campus }}
+                    </div>
+                </div>
+                {{ form.campus.errors }}
+                {% else %}
+                <input type="text" class="input"
+                    value="{% for value, campus in form.fields.campus.choices %}{% if value == form.campus.value %}{{ campus }}{% endif %}{% endfor %}"
+                    readonly>
+                {% endif %}
+            </div>
+        </div>
+        <div class="column">
+            <div class="field">
+                <label for="{{ form.npratosalunos.id_for_label }}" class="label">{% if individual %}Nº
+                    Estudantes{% else %}Nº Alunos{% endif %}
+                    ({{precoalunos}}€)</label>
+                {% if alterar %}
+                <b-numberinput v-model="npratosalunos" controls-position="compact" min="0"
+                    name="{{form.npratosalunos.name}}" :max="nalunos" />
+                {{ form.npratosalunos.errors }}
+                {% else %}
+                <input type="text" class="input" value="{{ form.npratosalunos.value|default_if_none:'' }}" readonly>
+                {% endif %}
+            </div>
+        </div>
+        <div class="column">
+            <div class="field">
+                <label for="{{ form.npratosdocentes.id_for_label }}" class="label">{% if individual %}Nº
+                    Não Estudantes{% else %}Nº Docentes{% endif %}
+                    ({{precoprofessores}}€)</label>
+                {% if alterar %}
+                <b-numberinput v-model="npratosdocentes" controls-position="compact" min="0"
+                    name="{{form.npratosdocentes.name}}" :max="Math.max(nresponsaveis, 5)" />
+                {{ form.npratosdocentes.errors }}
+                {% else %}
+                <input type="text" class="input" value="{{ form.npratosdocentes.value|default_if_none:'' }}" readonly>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock step_content %}

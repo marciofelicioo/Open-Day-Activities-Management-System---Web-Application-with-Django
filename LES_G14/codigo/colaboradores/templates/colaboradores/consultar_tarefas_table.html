@@ -1,0 +1,102 @@
+{% extends 'bulma_table_details.html' %}
+{% load informacao %}
+
+{% block details_content %}
+<p>
+    <button class="button is-info is-light">{{ date|get_due_date_string:row.record.id }}</button>
+</p>
+<table>
+    <tbody>
+        <tr>
+            <td><strong>Nome:</strong></td>
+            <td>{% if row.record.get_outra_descricao != "" %}{{row.record.get_outra_descricao}}{% else %}{{row.record.nome}}{% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Tipo de Tarefa:</strong></td>
+            <td>
+                {% if row.record.tipo == "tarefaAuxiliar" %}
+                Ajudar na Atividade
+                {% elif row.record.tipo == "tarefaAcompanhar" %}
+                Acompanhar Participantes
+                {% else %}
+                Outras Tarefas
+                {% endif %}
+            </td>
+        </tr>
+        {% if row.record.tipo == "tarefaAuxiliar" %}
+        <tr>
+            <td><strong>Campus:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.sessao.atividadeid.espacoid.edificio.campus.nome}}</td>
+        </tr>
+        <tr>
+            <td><strong>Edifício:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.sessao.atividadeid.espacoid.edificio.nome}}</td>
+        </tr>
+        <tr>
+            <td><strong>Sala:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.sessao.atividadeid.espacoid.nome}}</td>
+        </tr>
+        <tr>
+            <td><strong>Professor Universitário Responsável:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.sessao.atividadeid.professoruniversitarioutilizadorid.first_name}}
+                {{row.record.get_tarefa_especifica.sessao.atividadeid.professoruniversitarioutilizadorid.last_name}}
+            </td>
+        </tr>
+        {% elif row.record.tipo == "tarefaAcompanhar" %}
+        <tr>
+            <td><strong>Quem Acompanhar:</strong></td>
+            <td><a href="{% url 'inscricoes:inscricao-pdf' row.record.get_tarefa_especifica.inscricao.pk %}">Grupo {{row.record.get_tarefa_especifica.inscricao.get_grupo}} (Clicar para ver detalhes da inscrição)</a></td>
+        </tr>
+        <tr>
+            <td><strong>Origem:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.get_origem}}</td>
+        </tr>
+        <tr>
+            <td><strong>Destino:</strong></td>
+            <td>{{row.record.get_tarefa_especifica.get_destino}}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td><strong>Coordenador Responsável:</strong></td>
+            <td>{{row.record.coord.first_name}} {{row.record.coord.last_name}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="field is-grouped" style="margin-top: 10px">
+    {% if row.record.estado == 'naoConcluida'  %}
+    {% if date|tarefa_passou:row.record.id == False %}
+    <div class="control">
+        <a onclick="alert.warning('<b>Atenção!</b><br><br>Esta tarefa ainda não começou')">
+
+            <button class="button is-link">Iniciar</button>
+        </a>
+    </div>
+    {% else %}
+    <div class="control">
+        <a href="{% url 'colaboradores:iniciar-tarefa' row.record.id %}">
+            <button class="button is-link">Iniciar</button>
+        </a>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if row.record.estado == 'Iniciada'  %}
+    <div class="control">
+        <a href="{% url 'colaboradores:concluir-tarefa' row.record.id %}">
+            <button class="button is-link is-light">Concluir</button>
+        </a>
+    </div>
+    {% endif %}
+    {% if row.record.estado != 'Cancelada' and row.record.estado != 'Concluida' %}
+    <div class="control">
+        <a
+            onclick="alert.render('Tem a certeza que pretende cancelar esta tarefa?','{% url 'colaboradores:cancelar-tarefa' row.record.id %}')">
+            <button class="button is-light">
+                Cancelar
+            </button>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock details_content %}

@@ -1,0 +1,106 @@
+{% extends 'app.html' %}
+{% load django_tables2 %}
+
+{% block title %}- Minhas Tarefas{% endblock title %}
+
+{% block content %}
+
+<div class="columns">
+    <div class="column is-3">
+        <div class="menu">
+            <div class="menu-label">
+                Filtros Tarefas
+            </div>
+            <form method="get">
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" name="{{ filter.form.nome.name }}"
+                            value="{{ filter.form.nome.value|default_if_none:'' }}" type="text" placeholder="Nome">
+                        <span class="icon is-left">
+                            <i class="mdi mdi-magnify mdi-24px"></i>
+                        </span>
+                    </div>
+                </div>
+                <hr>
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                            <select name="{{ filter.form.tipo.name }}" value="{{filter.form.tipo.value}}">
+                                <option value="">Todos os Tipos</option>
+                                <option value="tarefaAuxiliar" {% if filter.form.tipo.value == "tarefaAuxiliar" %}
+                                    selected {% endif %}>
+                                    Ajudar na Atividade
+                                </option>
+                                <option value="tarefaAcompanhar" {% if filter.form.tipo.value == "tarefaAcompanhar" %}
+                                    selected {% endif %}>
+                                    Acompanhar Participantes
+                                </option>
+                                <option value="tarefaOutra" {% if filter.form.tipo.value == "tarefaOutra" %} selected
+                                    {% endif %}>
+                                    Outras Tarefas
+                                </option>
+                            </select>
+                        </div>
+                        <span class="icon is-left">
+                            <i class="mdi mdi-magnify mdi-24px"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                            <select name="{{ filter.form.estado.name }}" value="{{filter.form.estado.value}}">
+                                <option value="">Todos os Estados</option>
+                                <option value="naoConcluida" {% if filter.form.estado.value == "naoConcluida" %}
+                                    selected {% endif %}>
+                                    Não Concluída
+                                </option>
+                                <option value="Concluida" {% if filter.form.estado.value == "Concluida" %} selected
+                                    {% endif %}>
+                                    Concluida
+                                </option>
+                                <option value="Cancelada" {% if filter.form.estado.value == "Cancelada" %} selected
+                                    {% endif %}>
+                                    Cancelada
+                                </option>
+                                <option value="Iniciada" {% if filter.form.estado.value == "Iniciada" %} selected
+                                    {% endif %}>
+                                    Iniciada
+                                </option>
+                            </select>
+                        </div>
+                        <span class="icon is-left">
+                            <i class="mdi mdi-magnify mdi-24px"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="field is-grouped">
+                    <p class="control is-expanded">
+                        <input class="button is-light is-fullwidth" type="reset"
+                            onclick="event.preventDefault(); window.location='{% url 'colaboradores:consultar-tarefas' %}';"
+                            value="Limpar">
+                    </p>
+                    <p class="control is-expanded">
+                        <button class="button is-primary is-fullwidth" type="submit">
+                            <span class="icon">
+                                <i class="mdi mdi-magnify"></i>
+                            </span>
+                            <span>Pesquisar</span>
+                        </button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'home' %}">Início</a></li>
+                <li class="is-active"><a href="{% url 'colaboradores:consultar-tarefas' %}"
+                        aria-current="page">Consultar Tarefas</a></li>
+            </ul>
+        </nav>
+        {% render_table table 'colaboradores/consultar_tarefas_table.html' %}
+    </div>
+</div>
+{% endblock content %}

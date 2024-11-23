@@ -1,0 +1,74 @@
+{% extends 'bulma_table.html' %}
+
+{% block table_class %}is-hoverable{% endblock table_class %}
+
+{% block seta_th %}
+<th width="40px"></th>
+{% endblock seta_th %}
+
+{% block seta_tr %}
+<td class="chevron-cell"><a role="button"><span class="icon"><i class="mdi mdi-chevron-right mdi-24px"></i></span></a>
+</td>
+{% endblock seta_tr %}
+
+{% block detail %}
+<tr class="detail">
+    <td colspan="{{ table.columns|length|add:'1' }}" style="border-collapse: separate;">
+        <div class="detail-container">
+            <div style="font-size: 15px;">
+                {% block details_content %}
+                {% endblock details_content %}
+            </div>
+        </div>
+    </td>
+</tr>
+{% endblock detail %}
+
+{% block scripts %}
+<script>
+    $('.main-table > tbody > tr:not(.detail)').click(function (e) {
+        $('.main-table > tbody > tr.detail').not($(this).next()).removeClass('is-active');
+        $('.main-table > tbody > tr:not(.detail)').not($(this)).find('td.chevron-cell .icon').removeClass('is-expanded');
+        $(this).next().toggleClass('is-active');
+        $(this).find('td.chevron-cell .icon').toggleClass('is-expanded');
+    })
+</script>
+{% endblock scripts %}
+
+{% block style %}
+<style>
+    .main-table > tbody > tr:not(.detail) {
+        cursor: pointer;
+    }
+
+    .main-table > tbody > tr.detail {
+        box-shadow: inset 0 1px 3px #dbdbdb;
+        background: #fafafa;
+        background-color: rgb(250, 250, 250);
+    }
+
+    .main-table > tbody > tr.detail .detail-container {
+        padding: 1rem;
+    }
+
+    .main-table > tbody > tr.detail:hover {
+        background-color: #fafafa !important;
+    }
+
+    .main-table > tbody > tr.detail:not(.is-active) {
+        display: none;
+    }
+
+    .main-table > tbody > tr.detail .is-active {
+        display: block;
+    }
+
+    .icon.is-expanded {
+        transform: rotate(90deg);
+    }
+
+    .icon {
+        transition: transform 150ms ease-out, opacity 86ms ease-out;
+    }
+</style>
+{% endblock style %}

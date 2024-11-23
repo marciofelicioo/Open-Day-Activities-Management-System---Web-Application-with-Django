@@ -1,0 +1,142 @@
+{% extends 'app.html' %}
+
+{% block content %}
+<div class="container">
+    <div style="padding: 3rem 2vw 1rem;">
+        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem;">Consultar Questionário</h2>
+        <form method="post" id="formQuestionario" action="">
+            {% csrf_token %}
+            <div id="mensagemErroContainer" style="display: none; margin-top: 20px;">
+                <div class="notification is-danger is-light" style="text-align: center; width: 100%; opacity: 0.9;">
+                    <p id="mensagemErro"></p>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Data de Criação</label>
+                <div class="control">
+                    <input name="data_criacao" class="input" type="text" value="{{ questionario.created_at|date:'d/m/Y H:i:s' }}" disabled>
+                </div>
+            </div>
+            {% if questionario.estado.estado == 'publicado' %}
+            <div class="field">
+                <label class="label">Data de Publicação</label>
+                <div class="control">
+                    <input name="data_publicacao" class="input" type="text" value="{{ questionario.data_publicacao|date:'d/m/Y H:i:s' }}" disabled>
+                </div>
+            </div>
+            {% endif %}
+            {% if questionario.estado.estado == 'validado' %}
+            <div class="field">
+                <label class="label">Data de validação</label>
+                <div class="control">
+                    <input name="data_publicacao" class="input" type="text" value="{{ questionario.data_validacao|date:'d/m/Y H:i:s' }}" disabled>
+                </div>
+            </div>
+            {% endif %}
+            {% if questionario.estado.estado == 'arquivado' %}
+            <div class="field">
+                <label class="label">Data de arquivo</label>
+                <div class="control">
+                    <input name="data_publicacao" class="input" type="text" value="{{ questionario.data_arquivo|date:'d/m/Y H:i:s' }}" disabled>
+                </div>
+            </div>
+            {% endif %}
+            <div class="field">
+                <label class="label">Título</label>
+                <div class="control">
+                    <input name="titulo" class="input" type="text" value="{{ questionario.titulo }}" maxlength="200" required disabled>
+                </div>
+            </div>
+            
+            <div class="field">
+                <label class="label">Descrição</label>
+                <div class="control" >
+                    <textarea name="descricao" class="textarea" disabled>{{ questionario.descricao }}</textarea>
+                </div>
+            </div>
+            
+            <input type="hidden" id="totalPerguntas" value="{{ perguntas_e_opcoes|length }}">
+            <div id="perguntas-container">
+                {% for pergunta in perguntas_e_opcoes %}
+                <input type="hidden" name="pergunta_id_{{ forloop.counter }}" value="{{ pergunta.id }}">
+                
+                <div class="box" id="perguntaBox{{ forloop.counter }}">
+                    <div class="field">
+                        <label class="label">Tema</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="tema{{ forloop.counter }}" required disabled>
+                                    <option value="" disabled>Escolha um tema</option>
+                                    {% for tema in temas %}
+                                    <option value="{{ tema.pk }}" {% if pergunta.tema_id == tema.pk %} selected {% endif %} disabled>{{ tema }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Pergunta</label>
+                        <div class="control">
+                            <input type="text" name="perguntas{{ forloop.counter }}" class="input" value="{{ pergunta.texto }}" required disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <div class="control">
+                            <div class="select">
+                                <select id="tipoResposta{{ forloop.counter }}" name="tipoResposta{{ forloop.counter }}" required disabled>
+                                    <option value="">Selecione o tipo de resposta</option>
+                                    <option value="escolhaMultipla" {% if pergunta.tipo == 'escolhaMultipla' %}selected{% endif %} disabled>Escolha Múltipla</option>
+                                    <option value="inteiro" {% if pergunta.tipo == 'inteiro' %}selected{% endif %} disabled>Inteiro</option>
+                                    <option value="porExtenso" {% if pergunta.tipo == 'porExtenso' %}selected{% endif %} disabled>Por Extenso</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="containerResposta{{ forloop.counter }}" class="opcoesResposta" style="margin-top: 10px;">
+                        {% if pergunta.tipo == 'escolhaMultipla' or pergunta.tipo == 'inteiro' %}
+                        {% for opcao in pergunta.opcoes %}
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input type="text" name="respostaOpcao{{ forloop.parentloop.counter }}[]" class="input" value="{{ opcao }}" required disabled>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <hr>
+                </div>
+                {% endfor %}
+                
+                <!-- Aqui adiciono as novas perguntas, não misturo com as pré existentes na base de dados -->
+            </div>                  
+            <br>
+            <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+                <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+                    <div class="control">
+                        <a href="{% url 'questionario:listar-questionario' %}" class="button is-info is-light">Fechar Consulta</a>
+                    </div>
+                    <div class="control">
+                        {% if questionario.estado.estado == 'criado' and questionario.estado.estado != 'arquivado'%}
+                        <button type="submit" onclick="document.getElementById('formQuestionario').action='{% url 'questionario:validar_questionario' questionario.id %}';" class="button is-info is-light">Validar Questionário</button>
+                        {% endif %}
+                        {% if questionario.estado.estado == 'criado'%}
+                        <button type="submit" onclick="document.getElementById('formQuestionario').action='{% url 'questionario:rejeitar_questionario' questionario.id %}';" class="button is-danger is-light">Rejeitar Questionário</button>
+                        {% endif %}
+                        {% if questionario.estado.estado == 'validado'%}
+                        <button type="submit" onclick="document.getElementById('formQuestionario').action='{% url 'questionario:remover_validacao' questionario.id %}';" class="button is-danger is-light">Remover Validação</button>
+                        {% endif %}
+                    </div>
+                </div>        
+            </form>
+        </div>          
+    </div>
+    
+    {% endblock %}
+    
+    {% block title %}
+    - Editar Questionário
+    {% endblock %}
+    

@@ -1,0 +1,141 @@
+@import 'https://fonts.googleapis.com/css?family=Lato';
+.icon-expandable-180.is-expanded {
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+.icon-expandable-180{
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  height: 1.5rem;
+  width: 1.5rem;
+  -webkit-transition: opacity 86ms ease-out,-webkit-transform .15s ease-out;
+  transition: opacity 86ms ease-out,-webkit-transform .15s ease-out;
+  transition: transform .15s ease-out,opacity 86ms ease-out;
+  transition: transform .15s ease-out,opacity 86ms ease-out,-webkit-transform .15s ease-out;
+}
+.icon-expandable.is-expanded {
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+.icon-expandable{
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+    -webkit-transition: opacity 86ms ease-out,-webkit-transform .15s ease-out;
+    transition: opacity 86ms ease-out,-webkit-transform .15s ease-out;
+    transition: transform .15s ease-out,opacity 86ms ease-out;
+    transition: transform .15s ease-out,opacity 86ms ease-out,-webkit-transform .15s ease-out;
+}
+.arrow {
+  width: 0.8rem;
+  height: 0.8rem;
+  display: inline-block;
+  position: relative;
+  margin: 0 1rem;
+}
+.arrow span {
+  top: 0.5rem;
+  position: absolute;
+  width: 0.50rem;
+  height: 0.1rem;
+  background-color: black;
+  display: inline-block;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+.arrow span:first-of-type {
+  left: 0;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.arrow span:last-of-type {
+  right: 0;
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+.arrow.active span:first-of-type {
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+.arrow.active span:last-of-type {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.arrow--l-r {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-block;
+  position: relative;
+  margin: 0 1rem;
+}
+.arrow--l-r.left span:nth-child(4) {
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+.arrow--l-r.left span:nth-child(5) {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.arrow--l-r.right span:nth-child(1) {
+  -webkit-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+}
+.arrow--l-r.right span:nth-child(2) {
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.arrow--l-r span {
+  position: absolute;
+  height: 0.1rem;
+  background-color: #efefef;
+  -webkit-transition: -webkit-transform 0.2s ease;
+  transition: -webkit-transform 0.2s ease;
+  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, -webkit-transform 0.2s ease;
+}
+.arrow--l-r span:nth-child(1),
+.arrow--l-r span:nth-child(2),
+.arrow--l-r span:nth-child(4),
+.arrow--l-r span:nth-child(5) {
+  width: 0.625rem;
+  top: 0.625rem;
+}
+.arrow--l-r span:nth-child(1) {
+  right: 0;
+  -webkit-transform-origin: bottom right;
+          transform-origin: bottom right;
+}
+.arrow--l-r span:nth-child(2) {
+  right: 0;
+  -webkit-transform-origin: top right;
+          transform-origin: top right;
+}
+.arrow--l-r span:nth-child(3) {
+  width: 1.25rem;
+  top: 0.625rem;
+}
+.arrow--l-r span:nth-child(4) {
+  left: 0;
+  -webkit-transform-origin: bottom left;
+          transform-origin: bottom left;
+}
+.arrow--l-r span:nth-child(5) {
+  left: 0;
+  -webkit-transform-origin: top left;
+          transform-origin: top left;
+}

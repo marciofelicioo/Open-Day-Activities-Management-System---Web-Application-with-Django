@@ -1,0 +1,334 @@
+{% extends 'app.html' %}
+{% block content %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li><a href="{% url 'coordenadores:consultarTarefa' %}">Tarefas</a></li>
+    {% if  tarefa %}
+      <li class="is-active"><a href="">Alterar Tarefa</a></li>
+    {% else %}
+      <li class="is-active"><a href="">Adicionar Tarefa</a></li>
+    {% endif %}
+    
+  </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+    <form method="POST" action="">
+      {% csrf_token %}
+      <nav class="steps is-success">
+        <div class="step-item is-completed is-success is-active"> 
+        </div>
+        <div class="step-item is-completed is-success">
+          <div class="step-marker">
+              <span class="icon">
+                <i class="mdi mdi-account-details mdi-24px"></i>
+              </span>
+          </div>
+          <div class="step-details">
+              {% if  tarefa %}
+                <p class="step-title">Alterar Tarefa</p>
+              {% else %}
+                 <p class="step-title">Adicionar Tarefa</p>
+              {% endif %}
+          </div>
+        </div>
+        <div class="step-item is-completed is-success is-active"> 
+        </div>
+      </nav>        
+      <div style="padding: 1rem 2vw 0px;" onload="alterarTarefa();">
+            <hr>
+            <div class="column is-offset-3 is-6">
+                <div class="block">
+                {% if tarefa %}
+                      <h1 class="title is-3 has-text-centered">Tarefa {{tarefa.tipo_frontend}}</h1><input hidden name="tipo" value="{{tarefa.tipo}}">
+                {% else %}
+                    <div class="field">
+                        <label class="label">Tipo de tarefa: </label>
+                    </div>
+                    <div class="control">
+                      <label class="radio" style="margin-right: 1rem;"><input type="radio" name="tipo" value="tarefaAuxiliar"> 
+                        <span class="check"></span>
+                        <span class="control-label">Auxiliar Atividade</span>
+                      </label>
+                      <label class="radio" style="margin-right: 1rem;"><input type="radio" name="tipo" value="tarefaAcompanhar"> 
+                        <span class="check"></span>
+                        <span class="control-label">Acompanhar Participantes</span>
+                      </label>
+                      <label class="radio" ><input type="radio" name="tipo" value="tarefaOutra"> 
+                        <span class="check"></span>
+                        <span class="control-label">Outra</span>
+                      </label>
+                    </div>
+                  {% endif %}
+                </div>
+                <div id="tipoTarefa" >        
+                </div>   
+                <div class="field" style="padding-top:10px">
+                    <label class="label">Colaborador</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                          <select name="colab" id="id_colab">
+                            <option value="" selected>Não atribuir</option>
+                          </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+      </div>
+      <div class="column is-8 is-offset-2">
+                <div class="level">
+                  <div class="level-left">
+                    <a href="javascript:history.back()" class="button is-medium is-outlined" type="button">
+                      <span>Cancelar</span>
+                    </a>
+                  </div>
+                  <div class="level-right">
+                    <button type="submit" class="button is-medium is-success is-outlined is-link">
+                      {% if  tarefa %}
+                        <span>Alterar Tarefa</span>
+                      {% else %}
+                        <span>Adicionar Tarefa</span>
+                      {% endif %}
+                        <span class="icon is-medium">
+                          <i class="mdi mdi-check mdi-36px"></i>
+                        </span>
+                    </button>
+                  </div>
+                </div>
+      </div>
+    </form>
+  </div>
+
+
+
+<style>
+    .label {
+        font-weight: normal;
+    }
+    .b-steps .steps .step-items .step-item .step-details .step-title {
+        font-size: 1rem;
+    }
+</style>
+{% endblock content %}
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        if ("{{tarefa}}"!="None"){
+          var tipo="{{tarefa.tipo}}";
+          var tarefa = "{{tarefa.id}}"
+          $.ajax({                       
+          url: "{% url 'coordenadores:tipoTarefa' %}", 
+          method: 'POST',             
+          data: {
+              'tipo' : tipo,
+              'id' : tarefa,
+              csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+          },
+          success: function (data) {   
+            $("#tipoTarefa").html(data); 
+            if("{{tarefa.tipo}}"=="tarefaAuxiliar"){
+              diasSelect();
+              sessoesSelect();
+            }
+            else if("{{tarefa.tipo}}"=="tarefaAcompanhar"){  
+              diasGrupo();
+              grupoInfo();
+              grupoHorario();
+              grupoOrigem();
+              grupoDestino();
+            }
+            colaboradoresSelect();
+          }
+          });
+        }
+    });
+
+    $('input:radio').change(function(){
+        var tipo=this.value;
+        $.ajax({                       
+        url: "{% url 'coordenadores:tipoTarefa' %}", 
+        method: 'POST',             
+        data: {
+            'tipo' : tipo,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#tipoTarefa").html(data);    
+        }
+      });
+      
+    });
+
+/*---------------->AuxiliarAtividade<--------------------*/
+    function diasSelect(){
+      var atividadeId = document.getElementById("id_atividade").value; 
+      var tarefa = "{{tarefa.id}}";
+      $.ajax({                       
+        url: "{% url 'coordenadores:diasAtividade' %}", 
+        method: 'POST',             
+        data: {
+            'atividadeid': atividadeId,
+            'tarefa': tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_dia").html(data);
+          $("#id_sessao").html('<option value="">Escolha a sessão</option>');
+          $("#id_colab").html('<option value="">Não Atribuir</option>');
+        }
+      });
+    }
+
+    function sessoesSelect(){
+      var dia = document.getElementById("id_dia").value; 
+      var atividadeId = document.getElementById("id_atividade").value; 
+      var tarefa = "{{tarefa.id}}";
+      $.ajax({                       
+        url: "{% url 'coordenadores:sessoesAtividade' %}", 
+        method: 'POST',             
+        data: {
+            'dia': dia,
+            'atividadeid':atividadeId,
+            'tarefa': tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_sessao").html(data);           
+        }
+      });
+    }
+
+    function colaboradoresSelect(){
+      var tarefa = "{{tarefa.id}}";
+
+      var dia = document.getElementById("id_dia").value; 
+      if(document.getElementById("id_horario"))
+        var horario =document.getElementById("id_horario").value;
+      else
+        var horario="";
+      
+      if(document.getElementById("id_sessao"))
+        var sessao =document.getElementById("id_sessao").value; 
+      else
+        var sessao = "";
+      $.ajax({                       
+        url: "{% url 'coordenadores:colaboradores' %}", 
+        method: 'POST',             
+        data: {
+            'tarefa': tarefa,
+            'sessao':sessao,
+            'horario':horario,
+            'dia':dia,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_colab").html(data);           
+        }
+      });
+    }
+/*-------------------->EndAuxiliarAtividade<-----------------*/
+/*-------------------->Acompanhar Grupo<---------------------*/
+    function grupoInfo(){
+      var grupo_id = document.getElementById("id_grupo").value;
+      var tarefa = "{{tarefa.id}}"
+      $.ajax({                       
+        url: "{% url 'coordenadores:grupoInfo' %}", 
+        method: 'POST',             
+        data: {
+            'grupo_id': grupo_id,
+            'tarefa':tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#grupoinfo").html(data);           
+        }
+      });
+    }
+
+    function diasGrupo(){
+      var grupo_id = document.getElementById("id_grupo").value;
+      var tarefa = "{{tarefa.id}}"
+      $.ajax({                       
+        url: "{% url 'coordenadores:diasGrupo' %}", 
+        method: 'POST',             
+        data: {
+            'grupo_id': grupo_id,
+            'tarefa' : tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_dia").html(data);  
+          $("#id_origem").html('<option value="">Escolha o local de encontro</option>');   
+          $("#id_destino").html('<option value="">Escolha o local de destino</option>');            
+        }
+      });
+    }
+
+    function grupoHorario(){
+      var dia = document.getElementById("id_dia").value;
+      var grupo_id = document.getElementById("id_grupo").value; 
+      var tarefa = "{{tarefa.id}}"
+      $.ajax({                       
+        url: "{% url 'coordenadores:horarioGrupo' %}", 
+        method: 'POST',             
+        data: {
+            'dia': dia,
+            'grupo_id' : grupo_id,
+            'tarefa': tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_horario").html(data);           
+        }
+      });
+    }
+
+    function grupoOrigem(){
+      var dia = document.getElementById("id_dia").value;
+      var grupo_id = document.getElementById("id_grupo").value; 
+      var horario = document.getElementById("id_horario").value;
+      var tarefa = "{{tarefa.id}}";
+      $.ajax({                       
+        url: "{% url 'coordenadores:locaisOrigem' %}", 
+        method: 'POST',             
+        data: {
+            'dia': dia,
+            'grupo_id' : grupo_id,
+            'horario' : horario,
+            'tarefa' : tarefa,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_origem").html(data); 
+          $("#id_destino").html('<option value="">Escolha o local de destino</option>');          
+        }
+      });
+    }
+
+    function grupoDestino(){
+      var dia = document.getElementById("id_dia").value;
+      var grupo_id = document.getElementById("id_grupo").value; 
+      var horario = document.getElementById("id_horario").value;
+      var origem = document.getElementById("id_origem").value;
+      var tarefa = "{{tarefa.id}}";
+      $.ajax({                       
+        url: "{% url 'coordenadores:locaisDestino' %}", 
+        method: 'POST',             
+        data: {
+            'dia': dia,
+            'grupo_id' : grupo_id,
+            'horario' : horario,
+            'tarefa':tarefa,
+            'origem':origem,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {   
+          $("#id_destino").html(data);           
+        }
+      });
+    }
+/*----------------->EndAcompanharAtividade<--------------*/
+
+</script>
+{% endblock scripts %}

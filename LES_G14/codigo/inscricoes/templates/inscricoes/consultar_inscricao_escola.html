@@ -1,0 +1,195 @@
+{% extends 'inscricoes/consultar_inscricao_template.html' %}
+{% load static %}
+
+{% block step_load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{% endblock step_load %}
+
+{% block step_scripts %}
+
+<script src="{% static 'js/encoding.js' %}"></script>
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/axios.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/autocomplete/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/numberinput/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/datepicker/index.min.js' %}"></script>
+
+<script>
+    function htmlDecode(value) {
+        return $("<textarea />").html(value).text();
+    }
+
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                all_escolas: JSON.parse("{{escolas|escapejs}}"),
+                escolas: [],
+                escola: "{{ form.nome_escola.value|default_if_none:'' }}",
+                nalunos: parseInt("{{form.nalunos.value|default_if_none:'0'}}"),
+            }
+        },
+        computed: {
+            dia: () => {
+                let result = moment("{{ form.dia.value|default_if_none:'null' }}", "DD/MM/YYYY").toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+            inicio: () => {
+                let result = moment("{{ inicio|default_if_none:'null' }}", "DD/MM/YYYY").toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+            fim: () => {
+                let result = moment("{{ fim|default_if_none:'null' }}", "DD/MM/YYYY").toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+        },
+        methods: {
+            filterEscolas(input) {
+                this.escolas = this.all_escolas.filter(escola => escola.toLowerCase().includes(input
+                    .toLowerCase())).slice(0, 30);
+            },
+        }
+    });
+
+    
+    $(function () {
+        $("input").addClass("input");
+        $("input[name='{{form.nome_escola.name}}']").attr("id", "{{form.nome_escola.id}}");
+        $("form input").keypress(function (e) {
+            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                $('button[type=submit]').click();
+                return false;
+            } else {
+                return true;
+            }
+        });
+    });
+</script>
+{% endblock step_scripts %}
+
+{% block step_content %}
+      <style>
+                input[type="checkbox"] {
+                  -webkit-appearance: checkbox;
+                  -moz-appearance: checkbox;
+                  appearance: checkbox;
+                }
+              </style>
+<div id="vue-app">
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Informação da Inscrição <abbr
+            title="Deve selecionar o dia da visita e o número de alunos que vão participar. Se pretender visitar vários dias, deve criar uma inscrição para cada dia"><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div class="columns">
+        <div class="column">
+            <div class="field">
+                <div class="label">Dia da Visita</div>
+                <input type="text" class="input" value="{{form.dia.value}}" readonly>
+            </div>
+        </div>
+        <input type="hidden" name="{{form.nalunos.name}}" :value="nalunos">
+        <div class="column">
+            {% if alterar %}
+            <b-field label="Número de participantes">
+                <b-numberinput v-model="nalunos" required controls-position="compact" min="1">
+                </b-numberinput>
+            </b-field>
+
+{% comment %}          MARCAÇÃO DE PRESENÇA  
+                <div class="column">
+                    <div class="label">
+                        <label for="id_presenca_confirmada" class="label">Presença Confirmada:</label>
+                        <input type="checkbox" name="presenca_confirmada" id="id_presenca_confirmada" {% if inscricao.presenca_confirmada %}checked{% endif %}>
+                       }Ensure that the inscricao object passed to the template has the attribute 'presenca_confirmada'
+                    </div>
+                    <div class="field">
+                        <label for="id_numero_presentes" class="label">Número de Presentes:</label>
+                        <input type="number" name="numero_presentes" id="id_numero_presentes" value="{{ inscricao.numero_presentes|default_if_none:'' }}" min="0">
+                       Here, the min="0" ensures that only non-negative numbers are acceptable
+                        {{ form.nalunos.errors }}
+                        Ensure you want to show errors for 'nalunos' here, not for 'numero_presentes'
+                    </div>
+                </div>
+         {% endcomment %}
+
+            {% else %}
+            <div class="field">
+                <div class="label">Número de participantes</div>
+                <input type="text" class="input" value="{{form.nalunos.value}}" readonly>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <hr />
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Informação da Escola <abbr title="Deve fornecer o nome e a localidade da sua escola"><span class="icon"
+                style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div class="columns">
+        <div class="column">
+            <div class="field">
+                <label for="{{ form.nome_escola.id_for_label }}" class="label">Nome da Escola</label>
+                {% if alterar %}
+                <div class="controlis-clearfix">
+                    <b-autocomplete v-model="escola" :data="escolas" field="nome" @typing="filterEscolas" required
+                        name="{{form.nome_escola.name}}">
+                    </b-autocomplete>
+                </div>
+                {{ form.nome_escola.errors }}
+                {% else %}
+                <input type="text" class="input" value="{{form.nome_escola.value}}" readonly>
+                {% endif %}
+            </div>
+        </div>
+        <div class="column">
+            <div class="field">
+                <label for="{{ form.local.id_for_label }}" class="label">Localidade</label>
+                <div class="control is-clearfix">{{form.local}}</div>
+                {{ form.local.errors }}
+            </div>
+        </div>
+    </div>
+    {% if not individual %}
+    <hr />
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Informação da Turma <abbr title="Deve fornecer o ano, turma e área cientifica dos participantes"><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div class="columns">
+        <div class="column is-half">
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label for="{{ form.ano.id_for_label }}" class="label">Ano</label>
+                        <div class="control is-clearfix">{{form.ano}}</div>
+                        {{ form.ano.errors }}
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label for="{{ form.turma.id_for_label }}" class="label">Turma</label>
+                        <div class="control is-clearfix">{{form.turma}}</div>
+                        {{ form.turma.errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="field">
+                <label for="{{ form.areacientifica.id_for_label }}" class="label">Área Científica</label>
+                <div class="control is-clearfix">{{form.areacientifica}}</div>
+                {{ form.areacientifica.errors }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock step_content %}

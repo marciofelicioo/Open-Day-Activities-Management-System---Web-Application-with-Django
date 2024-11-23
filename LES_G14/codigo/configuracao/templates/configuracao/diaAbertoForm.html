@@ -1,0 +1,210 @@
+
+{% extends 'app.html' %}
+{% load static %}
+{% block content %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li><a href="{% url 'configuracao:diasAbertos' %}">Dias Abertos</a></li>
+    <li class="is-active"><a href="" aria-current="page">Configuracao do Dia Aberto</a></li>
+  </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+  <form method="POST" action="">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <article class="message is-danger">
+        <div class="message-body">
+          <p style="text-align: center;">
+          {% for error in form.non_field_errors %}
+            <strong>{{ error|escape }}</strong>
+          {% endfor %}
+          </p>
+        </div>
+      </article>
+    {% endif %}
+    
+    <div class="b-steps">
+      <section class="step-content">
+        <div class="step-item">
+            <div style="padding: 1rem 2vw 0px">
+              <hr>
+              <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                Informação do Dia Aberto
+              </h2>
+              <!--cols1 -->
+              <div class="columns">
+                <div class="column">
+                  <strong>{{form.enderecopaginaweb.errors}}</strong>                
+                  <div class="field">
+                    <label class="label">Endereço</label>
+                    <div class="control">
+                      {{form.enderecopaginaweb}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <strong>{{form.emaildiaaberto.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Email do Dia Aberto</label>
+                    <div class="control">
+                    {{form.emaildiaaberto}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--cols2 -->
+                  <strong>{{form.descricao.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Descrição</label>
+                    <div class="control">
+                      {{form.descricao}}
+                    </div>
+                  </div>
+
+            </div>
+            <!-- item 2-->
+            <div style="padding: 1rem 2vw 0px">
+              <hr>
+              <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Datas do Dia Aberto</h2>
+              <!--cols1 -->
+              <div class="columns">
+                <div class="column is-half">
+                <strong>{{form.ano.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Ano</label>
+                    <div class="control">
+                      {{form.ano}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--cols2 -->
+              <div class='columns'>
+                <div class="column">
+                  <strong>{{form.datadiaabertoinicio.errors}}</strong>            
+                  <div class="field">
+                    <label class="label">Início Dia Aberto <small>(AAAA-MM-DD HH:MM)</small></label> 
+                    <div class="control">
+                      {{form.datadiaabertoinicio}}
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <strong>{{form.datadiaabertofim.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Fim do Dia Aberto <small>(AAAA-MM-DD HH:MM)</small></label>
+                    <div class="control">
+                      {{form.datadiaabertofim}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--cols3 -->
+              <div class="columns">
+                <div class="column">  
+                  <strong>{{form.datapropostasatividadesincio.errors}}</strong>            
+                  <div class="field">
+                    <label class="label">Início do registo de atividades <small>(AAAA-MM-DD HH:MM)</small></label> 
+                    <div class="control">
+                      {{form.datapropostasatividadesincio}}
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <strong>{{form.dataporpostaatividadesfim.errors}}</strong>
+                  <div class="field">
+                  
+                    <label class="label">Fim do registo de atividades <small>(AAAA-MM-DD HH:MM)</small></label> 
+                    {{form.dataporpostaatividadesfim}}
+                  </div>
+                </div>
+              </div>
+              <!--cols4 -->
+              <div class="columns">
+                <div class="column">  
+                  <strong>{{form.datainscricaoatividadesinicio.errors}}</strong>            
+                  <div class="field">
+                    <label class="label">Início das incrições <small>(AAAA-MM-DD HH:MM)</small></label> 
+                    <div class="control">
+                      {{form.datainscricaoatividadesinicio}}
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <strong>{{form.datainscricaoatividadesfim.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Fim das inscrições <small>(AAAA-MM-DD HH:MM)</small></label> 
+                    {{form.datainscricaoatividadesfim}}
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Almoços</h2>
+              <!--cols5 -->
+              <div class="columns">
+                <div class="column">  
+                  <strong>{{form.precoprofessores.errors}}</strong>            
+                  <div class="field">
+                    <label class="label">Preço Professores</label> 
+                    <div class="control">
+                      {{form.precoprofessores}}
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <strong>{{form.precoalunos.errors}}</strong>
+                  <div class="field">
+                    <label class="label">Preço Alunos</label>
+                    {{form.precoalunos}}
+                  </div>
+                </div>
+              </div>
+
+              <!--cols 7-->
+              <hr>
+              <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Sessões</h2>
+              <div class="columns">
+                <div class="column is-half">  
+                  <strong>{{form.escalasessoes.errors}}</strong>            
+                  <div class="field">
+                    <label class="label">Duração das sessões <small>(HH:MM)</small></label> 
+                    <div class="control">
+                      <input type="time" name="escalasessoes" value="{{form.escalasessoes.value}}" class="input" step="00:05" min="00:05" max="00:59" required id="id_escalasessoes">
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <hr>
+            <div class="column is-8 is-offset-2">
+              <div class="level">
+                <div class="level-left">
+                  <a class="button is-large is-outlined" type="button" href="{% url 'configuracao:diasAbertos' %}">
+                    <span>Cancelar</span>
+                  </a>
+                </div>
+                <div class="level-right">
+                  <button class="button is-large is-success is-outlined is-link" type="submit">
+                    <span>Submeter</span>
+                    <span class="icon is-medium">
+                      <i class="mdi mdi-check mdi-36px"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+    </div>
+  </form>
+</div>
+<style>
+  .label {
+  font-weight: normal;
+}
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+{% endblock content %}

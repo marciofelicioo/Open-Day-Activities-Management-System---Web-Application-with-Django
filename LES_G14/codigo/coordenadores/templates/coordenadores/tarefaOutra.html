@@ -1,0 +1,30 @@
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Dia</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    {{form.dia}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Horário</label>
+            <div class="control">
+                <input type="time" name="horario" value="{{form.horario.value|date:'H:i'}}" class="input" onchange="colaboradoresSelect();" required id="id_horario">
+            </div>
+        </div>
+    </div>         
+</div>
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Descrição</label>
+            <div class="control">
+                {{form.descricao}}
+            </div>
+        </div>
+    </div>         
+</div>

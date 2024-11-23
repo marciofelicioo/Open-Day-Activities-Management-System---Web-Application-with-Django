@@ -1,0 +1,293 @@
+{% extends 'app.html' %}
+{% block title %}- Disponibilidade{% endblock title %}
+{% load static %}
+{% block content %}
+{% load configuracao_tags %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><a href="{% url 'home' %}">Início</a></li>
+        <li class="is-active"><a href="{% url 'colaboradores:minha-disponibilidade' %}">Disponibilidade</a></li>
+    </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+    <div class="steps is-success">
+
+        <div class="step-item is-completed is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                </span>
+
+            </div>
+
+            <div class="step-details">
+
+                <p class="step-title">Minha Disponibilidade</p>
+
+            </div>
+
+        </div>
+
+        <div class="step-item is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-flask mdi-24px"></i>
+
+                </span>
+
+            </div>
+
+
+
+            <div class="step-details">
+
+                <p class="step-title">Preferência de Atividade</p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="step-item is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-check"></i>
+
+                </span>
+
+            </div>
+
+            <div class="step-details">
+
+                <p class="step-title">Concluir</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST" action="">
+        <div id="id_removed_rows" style="display:none;"></div>
+        {% csrf_token %}
+  
+        <div class="b-steps">
+            <section class="step-content">
+                <div class="step-item">
+                    <div style="padding: 1rem 2vw 0px">
+
+                        <hr>
+
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Preferência de Tarefa
+                        </h2>
+                        
+                        <div class="control" id="id_tipo_tarefa" style="position:center">
+
+    {% if tarefa_auxiliar %}
+    <label class = "checkbox" style="margin-right:3%" for="id_tipo_tarefa_1"><input type="checkbox" name="tipo_tarefa" value="tarefaAuxiliar" id="id_tipo_tarefa_1" checked>
+ Ajudar em atividades</label>
+ {% else %}
+    <label class = "checkbox" style="margin-right:3%" for="id_tipo_tarefa_1"><input type="checkbox" name="tipo_tarefa" value="tarefaAuxiliar" id="id_tipo_tarefa_1" >
+ Ajudar em atividades</label>
+{% endif %}
+ {% if tarefa_acompanhar %}
+    <label class = "checkbox" style="margin-right:3%" for="id_tipo_tarefa_2"><input type="checkbox" name="tipo_tarefa" value="tarefaAcompanhar" id="id_tipo_tarefa_2" checked>
+ Acompanhar participantes</label>
+ {% else %}
+     <label class = "checkbox" style="margin-right:3%" for="id_tipo_tarefa_2"><input type="checkbox" name="tipo_tarefa" value="tarefaAcompanhar" id="id_tipo_tarefa_2" >
+ Acompanhar participantes</label>
+{% endif %}
+ {% if tarefa_outra %}
+    <label class = "checkbox" for="id_tipo_tarefa_3"><input type="checkbox" name="tipo_tarefa" value="tarefaOutra" id="id_tipo_tarefa_3" checked>
+ Outras tarefas</label>
+ {% else %}
+    <label class = "checkbox" for="id_tipo_tarefa_3"><input type="checkbox" name="tipo_tarefa" value="tarefaOutra" id="id_tipo_tarefa_3" >
+ Outras tarefas</label>
+{% endif %}
+
+</div>
+
+
+
+
+        <hr>
+
+        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Disponibilidade de Horário
+        </h2>
+        <div class='table'>
+            <div class='table-wrapper'>
+                {{horario_form_set.management_form}}
+                <table class="table has-mobile-cards is-hoverable is-fullwidth" id='table01'>
+                    <thead>
+                        <tr>
+                            <th style="cursor: pointer; width: 40%">Dia</th>
+                            <th style="cursor: pointer; width: 30%">Hora de Início</th>
+                            <th style="cursor: pointer; width: 30%">Hora de Fim</th>
+                        </tr>
+                    </thead>
+                    <tbody id='tableBody-01'>
+                        {% for form in horario_form_set %}
+
+                        <tr>
+                            {{form.id}}
+                            {% for field in form.visible_fields  %}
+                            {% if field.name != "DELETE" %}
+    
+                             <td data-label="{{field.label}}">
+                                {% if field.label == "Dia" %}
+                                <span class="select is-fullwidth is-empty" required>
+                                
+                                <select type="text" name="{{field.html_name}}" class="input" maxlength="32" id="id_{{field.html_name}}">
+                                    
+                                    <option value="" {% if field.value == 'None' %} selected="" {% endif %}>Escolha o dia</option>
+                                    
+                                    {% for dia in dias %}
+                                    
+                                    {% if dia|date:'Y-m-d' != field.value|date:'Y-m-d' and dia|date:'Y-m-d' != field.value %}
+                                    <option value="{{ dia|date:'Y-m-d'}}">{{dia}}</option>
+                                    {% else %}
+                                     <option value="{{ dia|date:'Y-m-d'}}" selected="">{{ dia}}</option>
+                                     {% endif %}
+                                    {% endfor %}  
+
+
+                                </select>
+                               
+                                </span>
+
+                                {% else %}
+                                {{field|force_required|safe}}
+                                {% endif %}
+                                {% if field.label == 'Inicio' %}
+                                    {% for error in form.non_field_errors %}
+                                        <div class="is-danger is-small">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}  
+                                {% endif %}                              
+							    {% for error in field.errors %}
+							    	<div class="is-danger">
+							    		<smal><strong>{{field.label|escape}} {{ error|escape }}</strong></smal>
+							    	</div>
+							    {% endfor %}
+                            </td>  
+
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <a role="button" type="button" class="button" id="add-more-rows">
+                    <span>Adicionar Horário</span>
+                    <span class="icon is-small">
+                        <i class="mdi mdi-plus mdi-24px"></i>
+                    </span>
+                </a>
+                <a id="del-row" role="button" type="button" class="button">
+                    <span>Remover Horário</span>
+                    <span class="icon is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-24px" style="color: #ff0000"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+</div>
+
+
+<div style="margin-top:2%;text-align:center;position:center;">
+    <a href="{% url 'home' %}">
+        <button type="button" value="Voltar" class="button is-outlined" style="margin-right:5%">Voltar</button>
+    </a>
+    <button style="" type="submit" class="button is-success is-outlined">
+        <span>Continuar</span>
+    </button>
+</div>
+</form>
+
+</section>
+
+            {% if msg %}
+                  <div  style="margin-left:30%;margin-right:30%; margin-top:3%">
+                    <div style="margin-top:2%;text-align: center;position:center;">
+                    <article class="message is-danger">
+                        <div class="message-body">
+                        <p style="text-align: center;">
+
+                    {% for x in erros %}
+                      <p style="color: #ff0000;">{{x}}</p>
+                    {% endfor %}
+                        </p>
+                        </div>
+                    </article>  
+                    </div>
+                </div>
+            {% endif %} 
+                           
+</div>
+</div>
+
+
+<style>
+    .label {
+        font-weight: normal;
+    }
+
+    .b-steps .steps .step-items .step-item .step-details .step-title {
+        font-size: 1rem;
+    }
+</style>
+{% endblock content %}
+{% block scripts %}
+<script>
+    $("#add-more-rows").click(function(){
+    var value = $("#id_form-TOTAL_FORMS").val();
+    value = Number(value) + Number('1');
+    document.getElementById("id_form-TOTAL_FORMS").value = value;
+    $.ajax({
+        url: "{% url 'colaboradores:ajaxAddHorarioRow' %}",
+        method: "POST",
+        data: {
+            'extra': value,
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+            $("#tableBody-01").append(data);
+        }
+    });
+})
+$('#del-row').click(function(e){
+    var value = $("#id_form-TOTAL_FORMS").val();
+    var initial = $("#id_form-INITIAL_FORMS").val();
+    var rowCount = $('#tableBody-01 tr').length;
+    if(Number(value) > Number(initial) && Number(value) > 1) {
+        $('#table01 tr:last').remove();
+        value = Number(value) - Number('1');
+        document.getElementById("id_form-TOTAL_FORMS").value = value;
+    } else if(rowCount > 1){
+        var id = Number($('#table01 tr:last input').attr('id').split('-')[1])
+        var form_delete = 'form-'+id+'-DELETE';
+        var delete_ = "<input type='hidden' name='"+form_delete+"' id='id_"+form_delete+"' value='on'>";
+        $('#table01 tr:last').append(delete_);
+        $('#table01 tr:last').hide();
+        $('#table01 tr:last').appendTo("#id_removed_rows");
+    } else {
+        alert.warning("Não pode eliminar todos os horários");
+    }
+})
+</script>
+{% endblock scripts %}

@@ -1,0 +1,35 @@
+{% extends 'app.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column; min-height: 100vh; padding-top: 2vh;">
+    <h2 style="font-size: 24px; margin-bottom: 20px;">Definir Data e Horário de Publicação</h2>
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px; width: 300px;">
+        {% csrf_token %}
+        <label for="data_inicial">Data Inicial:</label>
+        <input type="date" id="data_publicacao" name="data_inicial" class="input" required>
+
+        <label for="hora_inicial">Hora Inicial:</label>
+        <input type="time" id="hora_inicial" name="hora_inicial" class="input" required>
+
+        <label for="data_final">Data Final:</label>
+        <input type="date" id="data_final" name="data_final" class="input" required>
+
+        <label for="hora_final">Hora Final:</label>
+        <input type="time" id="hora_final" name="hora_final" class="input" required>
+
+        <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+            <div class="control">
+                <button type="submit" class="button is-success is-light">Salvar Datas</button>
+            </div>
+            <div class="control">
+                <a href="{% url 'questionario:listar-questionario' %}" class="button is-danger is-light">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% endblock %}

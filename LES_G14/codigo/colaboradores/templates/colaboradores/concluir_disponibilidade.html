@@ -1,0 +1,103 @@
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Disponibilidade{% endblock title %}
+
+
+
+{% block content %}
+
+<div>
+
+
+    <div style="padding: 3rem 2vw 1rem;">
+
+<div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Minha Disponibilidade</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-flask mdi-24px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Preferência de Atividade</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+            <div style="margin-bottom:3%;margin-top:3%;">
+                <h2 class="title is-5" style="text-align: center;" >Disponibilidade atualizada!</h2>
+            </div>
+
+
+                <div style="text-align: center;position:center">
+                <p>A sua disponibilidade foi atualizada com sucesso</p>
+                </div>
+
+    </div>
+
+    <div style="text-align: center;position:center;margin-top:4%">
+        <a href="{% url 'home' %}">
+            <button  class="button">Continuar</button>
+        </a>
+    </div>
+
+    {% endblock content %}
+
+</div>

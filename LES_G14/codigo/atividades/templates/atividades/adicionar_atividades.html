@@ -1,0 +1,388 @@
+{% extends 'app.html' %}
+{% block content %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li><a href="{% url 'atividades:consultarRoteiros' %}">Roteiros</a></li>
+    <li class="is-active"><a href="" aria-current="page"> Atividades</a></li>
+  </ul>
+</nav>
+<form method="POST" id="form-adicionar-atividade">
+    {% csrf_token %}
+  <div style="padding: 3rem 2vw 1rem">
+         <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-file-document mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Roteiro</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-flask mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Atividades</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+    <section class="step-content">
+        <div class="step-item">
+          <div style="padding: 1rem 2vw 0px;">
+            <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Atividades do roteiro</h2>
+
+            <div class="table ">
+                            <div class="table-wrapper">
+                                <table class="table has-mobile-cards is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                     Atividade
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                    Duração (em minutos)
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th style=""></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>    
+                                        {% for atividade in atividades_roteiro %} 
+                                        <tr id="atividad.id" draggable="false">
+                                            <td data-label="activity">{{atividade.atividade.nome}}</td>
+                                            <td data-label="Nome">{{atividade.duracao}}</td>
+                                            <td>
+                                            {% if check != 1 %}
+                                               <a onclick="alert.render('Tem a certeza que deseja eliminar a atividade do roteiro?','{% url 'atividades:eliminarAtividadeRoteiro' atividade.id%}')">
+                                                    <span class="icon has-text-danger">
+                                                        <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                                    </span>
+                                                </a>
+                                                {% else %}
+                                                <a onclick="alert.warning('O roteiro não pode ficar sem atividades')">
+                                                    <span class="icon has-text-danger">
+                                                        <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                                    </span>
+                                                </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %} 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr/>
+            <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Adicionar Atividade</h2>
+            <div class="columns">
+                      <div class="column is-2">
+                        <div class="field">
+                            <label class="label">Atividade</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="atividade" name="atividade">
+                                        <option value="">Escolha uma atividade</option>
+                                        {% for atividade in atividades %}
+                                        <option value="{{atividade.id}}">{{atividade.nome}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-2">
+                      <div class="field">
+                          <label class="label">Duração</label>
+                          <div class="control">
+                              <div class="select is-fullwidth">
+                                  <select id="duracao" name="duracao" required>
+                                      <option value="">Escolha a duração</option>
+                                      <option value=30>30 minutos</option>
+                                      <option value=45>45 minutos</option>
+                                      <option value=60>1 hora</option>
+                                      <option value=90>1 hora e 30 minutos</option>
+                                      <option value=120>2 horas</option>
+                                      <option value=180>3 horas</option>
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+                      <div>
+                        <p style="font-size: small;">Tempo Restante: <span id="tempo_restante">{{ duracaorestante }} min</span></p>
+                      </div>
+                    </div>
+                    <div class="column is-1">
+                        <div class="field" >
+                        <label class="label"></label>
+                        <br>
+                          <div class="control">
+                            <div class="has-text-centered">
+                                <button class="button is-success" name="new-activ" value="new-activ">
+                                    <span class="icon is-small">
+                                        <i class="mdi mdi-plus"></i>
+                                    </span>
+                                    <span>Adicionar Atividade</span>
+                                </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+        <hr>
+        </div>     
+    </section>
+  </form>
+  <form method="POST" id="form-adicionar-sessao">
+    {% csrf_token %}
+    <section class="step-content">
+      <div class="step-item">
+        <div style="padding: 1rem 2vw 0px;">
+          <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Sessões do roteiro</h2>
+
+          <div class="table ">
+                          <div class="table-wrapper">
+                              <table class="table has-mobile-cards is-hoverable">
+                                  <thead>
+                                      <tr>
+                                          <th  style="width: 300px;">
+                                              <div class="th-wrap">
+                                                  Dia
+                                                  <span class="icon is-small">
+                                                      <i class="mdi mdi-menu-up"></i>
+                                                  </span>
+                                              </div>
+                                          </th>
+                                          <th  style="width: 300px;">
+                                              <div class="th-wrap">
+                                                  Horário
+                                                  <span class="icon is-small">
+                                                      <i class="mdi mdi-menu-up"></i>
+                                                  </span>
+                                              </div>
+                                          </th>
+                                          <th style=""></th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>    
+                                      {% for sessao in sessoes_roteiro %} 
+                                      <tr id="sessao.id" draggable="false">
+                                          <td data-label="activity">{{sessao.dia}}</td>
+                                          <td data-label="Nome">{{sessao.horarioid.inicio}} - {{sessao.horarioid.fim}}</td>
+                                          <td>
+                                          {% if check2 != 1 %}
+                                             <a onclick="alert.render('Tem a certeza que deseja eliminar esta sessão do roteiro?','{% url 'atividades:eliminarSessaoRoteiro' sessao.id%}')">
+                                                  <span class="icon has-text-danger">
+                                                      <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                                  </span>
+                                              </a>
+                                              {% else %}
+                                              <a onclick="alert.warning('O roteiro não pode ficar sem sessões')">
+                                                  <span class="icon has-text-danger">
+                                                      <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                                  </span>
+                                              </a>
+                                              {% endif %}
+                                          </td>
+                                      </tr>
+                                      {% endfor %} 
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                      <hr/>
+          <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Adicionar Sessão</h2>
+          <div class="columns">
+                    <div class="column is-2">
+                      <div class="field">
+                          <label class="label">Dia</label>
+                          <div class="control">
+                              <div class="select is-fullwidth">
+                                  <select id="diasessao" name="diasessao" required>
+                                      <option value="">Escolha um dia</option>
+                                      {% for dia in dias %}
+                                        <option value="{{dia|date:'Y-m-d'}}">{{dia}}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="column is-2">
+                    <div class="field">
+                        <label class="label">Início</label>
+                        <div class="control">
+                            <input class="input" type="time" name="inicio" required>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="column is-2">
+                      <div class="field">
+                          <label class="label">Fim</label>
+                          <div class="control">
+                              <input class="input" type="time" name="fim" required>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="column is-1">
+                      <div class="field" >
+                      <label class="label"></label>
+                      <br>
+                        <div class="control">
+                          <div class="has-text-centered">
+                              <button class="button is-success" name="new-sessao" value="new-sessao">
+                                  <span class="icon is-small">
+                                      <i class="mdi mdi-plus"></i>
+                                  </span>
+                                  <span>Adicionar Sessao</span>
+                              </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+      <hr>
+      </div>     
+  </section>
+</form>
+    {% if error_message %}
+      <div  style="margin-left:30%;margin-right:30%; margin-top:%">
+          <div style="margin-top:2%;text-align: center;position:center;">
+          <article class="message is-danger">
+              <div class="message-body">
+              <p style="text-align: center;">
+                <p style="color: #ff0000;">{{ error_message }}</p>
+              </p>
+              </div>
+          </article>  
+          </div>
+      </div>
+    {% endif %}
+    <div class="column is-8 is-offset-2">
+      <div class="level">
+      <div class="level-left">
+         <a  class="button is-medium is-outlined" href="{% url 'atividades:alterarRoteiro' id %}" name="anterior" value="anterior">
+            <span class="icon is-medium">
+              <i class="mdi fa fa-arrow-left mdi-36px"></i>
+            </span>
+            <span>Anterior</span>
+         </a>
+      </div>
+      <div class="level-right">
+      {% if check > 0 %}
+          <a id="concluir" href="{% url 'atividades:verResumoRoteiro' id %}" class="button is-medium is-success is-outlined is-link" name="proximo" value="proximo">
+            <span>Proximo</span>
+            <span class="icon is-medium">
+                  <i class="mdi mdi-forward mdi-36px"></i>
+                </span>
+          </a>
+          {% else %}
+            <a id="concluir" onclick="alert.warning('O Roteiro não pode ser criado sem atividades !','{% url 'atividades:adicionarAtividades' id %}')" class="button is-medium is-success is-outlined is-link" name="save" value="Save">
+            <span>Proximo</span>
+            <span class="icon is-medium">
+              <i class="mdi mdi-forward mdi-36px"></i>
+            </span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+
+<style>
+  .label {
+  font-weight: normal;
+  }
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+<style>
+    .dialog .modal-card .modal-card-body.is-titleless {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+</style>
+{% endblock content %}
+
+{% block scripts%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Quando uma opção for selecionada no menu suspenso de duração
+        $('#duracao').change(function() {
+            // Obtenha o valor selecionado
+            var duracaoSelecionada = parseInt($(this).val());
+            // Atualize o tempo restante com o novo valor
+            var novoTempoRestante = {{ duracaorestante }} - duracaoSelecionada;
+            // Atualize o conteúdo da span
+            $('#tempo_restante').text(novoTempoRestante + ' min');
+        });
+    });
+</script>
+{% endblock scripts%}

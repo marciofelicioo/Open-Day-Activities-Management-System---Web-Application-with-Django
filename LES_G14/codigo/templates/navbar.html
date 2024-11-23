@@ -1,0 +1,543 @@
+{% load static %}
+{% load poll_extras %}
+{% load notificacoes_extras %}
+{% load inscricoes_extras %}
+{% load notifications_tags %}
+
+<nav id="main-navbar" class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item logo" href="{% url 'home' %}">
+      <img src="{% static 'img/logo-navbar.png' %}" alt="Dia Aberto">
+    </a>
+
+    <a role="button" class="navbar-burger burger" onclick="onclick_burger(event)" data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div class="navbar-menu">
+    <div class="navbar-start">
+
+      {% if request.user|has_group:'Participante' %}
+      <a href="{% url 'inscricoes:criar-inscricao' %}" class="navbar-item">
+        Criar Inscrição
+      </a>
+      {% if request.user|inscrito %}
+      <a href="{% url 'inscricoes:consultar-inscricoes-participante' %}" class="navbar-item">
+        Minhas Inscrições
+      </a>
+      {% endif %}
+      {% elif request.user|has_group:'Colaborador'%}
+      <a href="{% url 'colaboradores:consultar-tarefas' %}" class="navbar-item">
+        Minhas Tarefas
+      </a>
+      <a href="{% url 'colaboradores:minha-disponibilidade' %}" class="navbar-item">
+        Minha Disponibilidade
+      </a>
+      {% elif request.user|has_group:'ProfessorUniversitario'%}
+      <a href="{% url 'atividades:minhasAtividades' %}" class="navbar-item">
+        Minhas Atividades
+      </a>
+      {% elif request.user|has_group:'Coordenador'%}
+      <a href="{% url 'atividades:atividadesUOrganica' %}" class="navbar-item">
+        Atividades dos Departamentos
+      </a>
+      <a href="{% url 'coordenadores:consultarTarefa' %}" class="navbar-item">
+        Tarefas
+      </a>
+      <a href="{% url 'inscricoes:consultar-inscricoes-coordenador' %}" class="navbar-item">
+        Inscrições dos Departamentos
+      </a>
+      <a href="{% url 'utilizadores:consultar-utilizadores' %}" class="navbar-item">
+        Utilizadores
+      </a>
+      <a href="{% url 'atividades:consultarRoteiros' %}" class="navbar-item">
+        Roteiros
+      </a>
+        
+
+      {% elif request.user|has_group:'Administrador'%}
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Configurações
+        </a>
+        <div class="navbar-dropdown">
+          <a href="{% url 'configuracao:verUOs' %}" class="navbar-item">Unidades Organicas</a>
+          <a href="{% url 'configuracao:verEdificios' %}" class="navbar-item">Edificios e Espaços</a>
+          <a href="{% url 'configuracao:verDepartamentos' %}" class="navbar-item">Departamentos</a>
+          <a href="{% url 'configuracao:verCursos' %}" class="navbar-item">Cursos</a>
+          <a href="{% url 'configuracao:verTransportes' %}" class="navbar-item">Transportes</a>
+          <a href="{% url 'configuracao:verMenus' %}" class="navbar-item">Almoços</a>
+          <a href="{% url 'configuracao:verTemas' %}" class="navbar-item">Áreas Científicas</a>
+          <a href="{% url 'configuracao:verTemasQuestionario' %}" class="navbar-item">Temas Questionários</a>
+          <a href="{% url 'inscricoes:consultar-inscricoes-admin' %}" class="navbar-item">Registar Presenças</a>
+        </div>
+      </div>
+      <a href="{% url 'configuracao:diasAbertos' %}" class="navbar-item">
+        Dias Abertos
+      </a>
+      <a href="{% url 'utilizadores:consultar-utilizadores' %}" class="navbar-item">
+        Utilizadores
+      </a>
+      <a href="{% url 'atividades:atividadesAdmin' %}" class="navbar-item">
+        Atividades
+      </a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Inscrições
+        </a>
+        <div class="navbar-dropdown">
+          <a href="{% url 'inscricoes:consultar-inscricoes-admin' %}" class="navbar-item">
+            Normal
+          </a>
+          <a href="{% url 'inscricoes:criarInscricaoUltimaHora' %}" class="navbar-item">
+            Última Hora
+          </a>
+        </div>
+      </div>
+      <a href="{% url 'atividades:consultarRoteiros' %}" class="navbar-item">
+        Roteiros
+      </a>
+      <a href="{% url 'questionario:listar-questionario' %}" class="navbar-item">
+        Questionário
+      </a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Relatórios
+        </a>
+        <div class="navbar-dropdown">
+          <a href="{% url 'atividades:relatoriosRoteiros' %}" class="navbar-item">Roteiros/Atividades</a>
+          <a href="{% url 'configuracao:relatoriosTransportes' %}" class="navbar-item">Transportes</a>
+          <a href="{% url 'inscricoes:relatoriosPresencas' %}" class="navbar-item">Presenças</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <a href="" class="navbar-item">
+
+    </a>
+    {% endif %}
+  </div>
+  <div class="navbar-end">
+    <div class="navbar-item">
+      {% if user.is_authenticated %}
+      {% if request.user|has_group:'Administrador' %}
+      <a role="button" href="{% url 'inscricoes:estatisticas' %}" class="button is-text"
+        style="margin-right: 0.9rem">
+        <span class="icon">
+          <i class="fa fa-chart-pie" style="font-size: 20px;"></i>
+        </span>
+      </a>
+      {% endif %}
+
+        <div class="dropdown is-bottom-left is-mobile-modal">
+
+          <div onclick="notificacoes()">
+            <div id="notificacoes_trigger" role="button" class="dropdown-trigger">
+              <span role="button">
+
+                <div type="button" data-badge="0" class="button has-badge-rounded has-badge-warning is-text"
+                  style="margin-right: 0.9rem">
+                  <span>
+
+                    <span class="icon">
+                      <span id="badge-inject" style="display:none;" title="Badge top right"
+                        class="badge is-warning">{% live_notify_badge %}</span>
+
+                      {{ request.user|atualizar_informacoes }}
+                      <i class=" mdi mdi-bell mdi-24px"></i>
+
+
+
+                    </span>
+
+                  </span>
+
+                </div>
+
+              </span>
+            </div>
+          </div>
+
+          <div id="ver_notificacoes" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+              <header class="modal-card-head">
+                <p class="modal-card-title">Notificações</p>
+
+                <button onclick="notificacoes()" class="delete" aria-label="close"></button>
+
+              </header>
+              <section class="modal-card-body">
+                <nav class="panel">
+
+                  <p class="panel-tabs">
+                    <a class="tablinks is-active" onclick="openNotificacoes(event, 'Todas')">Todas</a>
+                    <a class="tablinks" onclick="openNotificacoes(event, 'Novas')">Novas</a>
+                    <a class="tablinks" onclick="openNotificacoes(event, 'Anteriores')">Anteriores</a>
+                  </p>
+                  <div id="Todas" style="display:block" class="tabcontent">
+                    {% notification_list %}
+                    {% for notificacao in request.user|notificacoes_lidas %}
+                    <div data-tooltip="Click para ver detalhes">
+                      {% if notificacao.unread == False %}
+                      <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 notificacao.id %}"
+                        class="panel-block">
+                        {% else %}
+                        <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 notificacao.id %}"
+                          class="panel-block" style="background: Gainsboro;">
+                          {% endif %}
+
+                          {% if notificacao.level == "info" %}
+                          <span class="icon has-text-info">
+                            <i class="fas fa-info-circle"></i>
+                          </span>
+                          {% elif notificacao.level == "success" %}
+                          <span class="icon has-text-success">
+                            <i class="fas fa-check-square"></i>
+                          </span>
+                          {% elif notificacao.level == "warning" %}
+                          <span class="icon has-text-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                          </span>
+                          {% elif notificacao.level == "error" %}
+                          <span class="icon has-text-danger">
+                            <i class="fas fa-ban"></i>
+                          </span>
+                          {% endif %}
+
+
+                          <p>
+                            <strong>
+                              {{notificacao.description}}
+                            </strong>
+                          </p>
+
+                        </a>
+                    </div>
+                    {%endfor%}
+                    {% if request.user|nr_notificacoes > 0 %}
+                    <div class="panel-block">
+                      <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}"
+                        class="dropdown-item is-disabled">
+                        <button class="button is-link is-outlined is-fullwidth">
+                          Ver todas as notificações
+                        </button>
+                      </a>
+                    </div>
+                    {% else %}
+                    <p id="sem-mensagens" style="text-align:center;margin-top:2%;"><strong>Não tem nenhuma
+                        notificação.</strong></p>
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}"
+                      class="dropdown-item is-disabled">
+                      <button class="button is-link is-outlined is-fullwidth">
+                        Caixa de entrada
+                      </button>
+                    </a>
+                    {% endif %}
+
+                  </div>
+                  <div id="Novas" style="display:none" class="tabcontent">
+
+                    {% notification_list %}
+
+                    {% if request.user|has_notification %}
+                    <div class="panel-block">
+                      <a onclick="alert.render('Tem a certeza que pretende marcar todas as notificações como lidas?','{% url 'notificacoes:ler-notificacoes'%}')"
+                        role="listitem" tabindex="0" class="dropdown-item is-disabled">
+
+                        <button class="button is-link is-outlined is-fullwidth">
+                          Marcar notificações como lidas
+                        </button>
+                      </a>
+                    </div>
+                    {% else %}
+                    <p id="sem-notificacoes" style="text-align:center;margin-top:2%;"><strong>Não tem nenhuma
+                        notificação nova.</strong></p>
+
+                    {% endif %}
+
+                  </div>
+                  <div id="Anteriores" style="display:none" class="tabcontent">
+                    {% for notificacao in request.user|notificacoes_lidas %}
+                    <div data-tooltip="Click para ver detalhes">
+                      <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 notificacao.id %}"
+                        class="panel-block">
+                        {% if notificacao.level == "info" %}
+                        <span class="icon has-text-info">
+                          <i class="fas fa-info-circle"></i>
+                        </span>
+                        {% elif notificacao.level == "success" %}
+                        <span class="icon has-text-success">
+                          <i class="fas fa-check-square"></i>
+                        </span>
+                        {% elif notificacao.level == "warning" %}
+                        <span class="icon has-text-warning">
+                          <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                        {% elif notificacao.level == "error" %}
+                        <span class="icon has-text-danger">
+                          <i class="fas fa-ban"></i>
+                        </span>
+                        {% endif %}
+
+
+                        <p><strong>{{notificacao.description}}</strong></p>
+
+                      </a>
+                    </div>
+                    {%endfor%}
+                    {% if request.user|nr_notificacoes_lidas > 0 %}
+                    <div class="panel-block">
+
+
+                      <a onclick="alert.render('Tem a certeza que pretende eliminar todas as notificações lidas?','{% url 'notificacoes:limpar-notificacoes' 2 %}')"
+                        role="listitem" tabindex="0" class="dropdown-item is-disabled">
+
+                        <button class="button is-link is-outlined is-fullwidth">
+                          Limpar notificações lidas
+                        </button>
+                      </a>
+
+                    </div>
+                    {% else %}
+                    <p style="text-align:center;margin-top:2%"><strong>Não tem nenhuma notificação anterior.</strong>
+                    </p>
+                    {% endif %}
+
+                  </div>
+
+
+                </nav>
+              </section>
+            </div>
+          </div>
+
+          <div id="mensagens-dropdown" class="dropdown is-right"
+            onclick="event.currentTarget.classList.toggle('is-active')">
+            <div class="dropdown-trigger">
+              <span role="button" aria-haspopup="true" aria-controls="dropdown-menu6">
+                <div type="button" data-badge="0" class="button has-badge-rounded has-badge-warning is-text"
+                  style="margin-right: 0.9rem">
+                  <span>
+                    <span class="icon">
+                      {% if request.user|nr_mensagens_nao_lidas > 0 %}
+                      <span id="badge-inject"
+                        class="badge is-warning">{{request.user|nr_mensagens_nao_lidas}}</span>
+                      {% endif %}
+                      <i class="mdi mdi-message mdi-24px"></i>
+                    </span>
+                  </span>
+                </div>
+              </span>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu6" role="menu" style="min-width: 23rem">
+              <div class="dropdown-content">
+                {% if request.user|nr_mensagens > 0 %}
+                {% for msg in request.user|mensagens %}
+                <div class="dropdown-item" data-tooltip="Click para ver detalhes">
+                  {% if msg.mensagem.lido == True %}
+                  <a href="{% url 'notificacoes:detalhes-mensagem' 0 msg.mensagem.id %}" class="panel-block"
+                    style="flex-direction: column; align-items: stretch;">
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 0 msg.mensagem.id %}" class="panel-block"
+                      style="background: WhiteSmoke; flex-direction: column; align-items: stretch;">
+                      {% endif %}
+                      <p>
+                        <strong>
+                          {{msg.mensagem.titulo}}
+                        </strong>
+                      </p>
+                      <br>
+                      <small>{{msg.mensagem.emissor.full_name}}</small>
+                    </a>
+                </div>
+                {%endfor%}
+                {% else %}
+                <div class="dropdown-item">
+                  <strong>Não tem mensagens recebidas</strong>
+                </div>
+                {% endif %}
+                <hr class="dropdown-divider">
+                <div class="dropdown-item level">
+                  <div class="level-left">
+                    <span class="icon">
+                      <i class="mdi mdi-message-text"></i>
+                    </span>
+                    <a href="{% url 'notificacoes:enviar-notificacao' %}">Nova mensagem</a>
+                  </div>
+                  <div class="level-right">
+                    <small><a href="{% url 'notificacoes:detalhes-mensagem' 0 0 %}">Ver todas as mensagens</a></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div onclick="definicoes()">
+            <div id="dropdown_definicoes" class="dropdown is-right">
+              <div role="button" class="dropdown-trigger">
+                <span role="button">
+                  <div type="button" data-badge="0" class="button has-badge-rounded has-badge-warning is-text"
+                    style="margin-right: 0.9rem">
+                    <span>
+                      <span class="icon">
+                        <i class="mdi mdi-account-circle mdi-24px"></i>
+                      </span>
+                    </span>
+                  </div>
+                </span>
+              </div>
+              <div class="background" aria-hidden="true"></div>
+              <div class="dropdown-menu" aria-hidden="true">
+                <div role="menu" class="dropdown-content">
+
+                  <div role="menuitem" tabindex="0" class="dropdown-item">
+                    <a href="{% url 'utilizadores:alterar-utilizador' %}" role="listitem" tabindex="0"
+                      class="dropdown-item is-disabled">
+                      <span class="icon">
+                        <i class="mdi mdi-account-edit mdi-24px"></i>
+                      </span>
+
+                      <strong>Alterar dados de conta</strong>
+
+
+                    </a>
+
+
+
+                    <a href="{% url 'utilizadores:alterar-password' %}" role="listitem" tabindex="0"
+                      class="dropdown-item is-disabled">
+
+                      <span class="icon">
+                        <i class="mdi mdi-key-variant mdi-24px"></i>
+                      </span>
+
+                      <strong>Alterar palavra-passe</strong>
+
+                    </a>
+
+
+
+
+
+                    {% if request.user|has_group:'Participante'%}
+                    <a onclick="alert.render('Tem a certeza que pretende eliminar a sua conta?<br><br><b>Atenção!</b><br><br>A sua <b>incrição</b> será apagada permanentemente.','{% url 'utilizadores:apagar-conta'%}')"
+                      role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                      {% elif request.user|has_group:'Colaborador'%}
+                      <a onclick="alert.render('Tem a certeza que pretende eliminar a sua conta?<br><br><b>Atenção!</b><br><br>As suas <b>tarefas</b> deixarão de lhe estar atribuidas.','{% url 'utilizadores:apagar-conta'%}')"
+                        role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                        {% elif request.user|has_group:'ProfessorUniversitario'%}
+                        <a onclick="alert.render('Tem a certeza que pretende eliminar a sua conta?<br><br><b>Atenção!</b><br><br>As suas <b>atividades</b> serão apagadas permanentemente.','{% url 'utilizadores:apagar-conta'%}')"
+                          role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                          {% elif request.user|has_group:'Coordenador'%}
+                          <a onclick="alert.render('Tem a certeza que pretende eliminar a sua conta?<br><br><b>Atenção!</b><br><br> As <b>atividades dos departamentos</b> pelo qual está responsável serão apagadas permanentemente.<br><br>As <b>tarefas dos colaboradores</b> pelo qual está responsável serão apagadas permanentemente.','{% url 'utilizadores:apagar-conta'%}')"
+                            role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                            {% elif request.user|has_group:'Administrador'%}
+                            {% if user|apagar_admin:user.id %}
+                            <a onclick="alert.render('Tem a certeza que pretende eliminar a sua conta?<br><br><b>Atenção!</b><br><br>Todas as suas <b>informações</b> serão apagadas permanentemente incluindo os <b>dados de configuração</b> do dia aberto pelo qual está responsável.','{% url 'utilizadores:apagar-conta'%}')"
+                              role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                              {% else %}
+
+                              <a onclick="alert.warning('Não pode apagar o seu perfil porque é o unico administrador do dia aberto neste momento.')"
+                                role="listitem" tabindex="0" class="dropdown-item is-disabled">
+                                {% endif %}
+                                {% endif %}
+
+                                <span class="icon">
+                                  <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                </span>
+                                <strong>Apagar Conta</strong>
+                              </a>
+
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+
+
+          {% if user.is_authenticated %}
+          <a href="{% url 'utilizadores:logout' %}">
+            <div type="button" class="button">
+              <span class="icon is-small">
+                <i class="mdi mdi-login-variant"></i>
+              </span>
+              <span>Sair</span>
+            </div>
+          </a>
+          {% else %}
+
+
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="buttons">
+                <a href="{% url 'utilizadores:escolher-perfil' %}">
+                  <bottom class="button is-primary">
+                    <strong>Registar</strong>
+                </a>
+                </a>
+              </div>
+            </div>
+          </div>
+
+
+          <a href="{% url 'utilizadores:login' %}">
+            <div type="button" class="button">
+              <span class="icon is-small">
+                <i class="mdi mdi-login-variant"></i>
+              </span>
+              <span>Entrar</span>
+            </div>
+          </a>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+</nav>
+
+
+{% block scripts %}
+<script>
+  function detalhes_url_notificacoes(item) {
+    var tmp = String(item.id)
+    return "{% url 'notificacoes:categorias-notificacao-automatica' 0 12345 %}".replace("12345", tmp);
+  }
+</script>
+<script type="text/javascript" src="{% static 'js/notificacoes.js' %}"></script>
+<script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
+<script type="text/javascript" src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+{% register_notify callbacks='fill_notification_badge,lista_notificacoes,my_special_notification_callback' %}
+
+<script>
+  $('#dropdown_definicoes').click(function (e) {
+    $('#mensagens-dropdown').removeClass('is-active');
+  })
+
+  $('#mensagens-dropdown').click(function (e) {
+    $('#dropdown_definicoes').removeClass('is-active');
+  })
+
+  $('#notificacoes_trigger').click(function (e) {
+    $('#dropdown_definicoes').removeClass('is-active');
+    $('#mensagens-dropdown').removeClass('is-active');
+  })
+
+  function onclick_burger(e) {
+    $('#main-navbar > .navbar-menu').toggleClass('is-active');
+    $('#dropdown_definicoes').toggleClass('is-right');
+    $('#dropdown_definicoes').toggleClass('is-left');
+    $('#mensagens-dropdown').toggleClass('is-right');
+    $('#mensagens-dropdown').toggleClass('is-left');
+  };
+</script>
+
+{% endblock scripts %}

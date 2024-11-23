@@ -1,0 +1,239 @@
+{% extends 'app.html' %}
+
+{% block content %}
+<div class="container">
+    <div style="padding: 3rem 2vw 1rem;">
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem;">Criar Questionário</h2>
+        </div>
+        <form method="post" id="formularioQuestionario" data-titulos-existentes="{{ titulos_existentes|join:',' }}" data-descricoes-existentes="{{ descricoes_existentes|join:',' }}">
+            {% csrf_token %}
+            <div id="mensagemErroContainer" style="display: none; margin-top: 20px;">
+                <div class="notification is-danger is-light" style="text-align: center; width: 100%; opacity: 0.9;">
+                    <p id="mensagemErro"></p>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Título</label>
+                <div class="control is-clearfix">
+                    <input name="titulo" class="input" type="text" maxlength="200" required>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Descrição</label>
+                <div class="control is-clearfix">
+                    <textarea name="descricao" class="textarea"></textarea>
+                </div>
+            </div>
+            
+            <div id="perguntas-container">
+                <!-- Perguntas e temas serão adicionadas aqui dinamicamente -->
+            </div>
+            <div style="display: flex; justify-content: flex-start; margin-top: 20px;">
+                <button type="button" class="button is-primary" onclick="adicionarTemaComPergunta()">Adicionar Pergunta</button>
+            </div>
+            <br>
+            <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+                <div class="control">
+                    <a href="{% url 'questionario:listar-questionario' %}" class="button is-danger is-light">Cancelar</a>
+                </div>
+                <div class="control">
+                    <button type="submit" class="button is-success is-light">Criar Questionário</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let temaCount = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('formularioQuestionario');
+        if (form) {
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                verificarPerguntas();
+            };
+        }
+    });
+    function adicionarTemaComPergunta() {
+        temaCount++;
+        const temaDiv = document.createElement('div');
+        temaDiv.classList.add('tema-com-pergunta', 'box');
+        temaDiv.setAttribute('id', 'tema' + temaCount);
+        temaDiv.innerHTML = `
+        <div class="field">
+            <label class="label">Tema</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="tema${temaCount}" required onchange="alterarTipoResposta(this, ${temaCount})">
+                        <option value="" disabled selected>Escolha um tema</option>
+                        {% for tema in temas %}
+                        <option value="{{ tema.pk }}">{{ tema }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Pergunta</label>
+            <div class="control">
+                <input type="text" name="perguntas${temaCount}" class="input" placeholder="Digite a pergunta aqui" required>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <div class="select">
+                    <select id="tipoResposta${temaCount}" name="tipoResposta${temaCount}" onchange="alterarTipoResposta(${temaCount})" required>
+                        <option value="">Selecione o tipo de resposta</option>
+                        <option value="escolhaMultipla">Escolha Múltipla</option>
+                        <option value="inteiro">Inteiro</option>
+                        <option value="porExtenso">Por Extenso</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="containerResposta${temaCount}" class="opcoesResposta" style="margin-top: 10px;">
+            <!-- Container para opções de resposta -->
+        </div>
+        <div class="field is-grouped is-justify-content-space-between" style="margin-top: 10px; justify-content: center;">
+            <button class="button is-danger is-light" onclick="removerTemaComPergunta('tema${temaCount}')">Remover Pergunta</button>
+        </div>
+        <hr>
+        `;
+        document.getElementById('perguntas-container').appendChild(temaDiv);
+    }
+    
+    function alterarTipoResposta(temaCount) {
+        const tipoResposta = document.getElementById(`tipoResposta${temaCount}`).value;
+        const container = document.getElementById(`containerResposta${temaCount}`);
+        container.innerHTML = ''; // Limpar o container para novas escolhas
+        
+        if (tipoResposta === 'escolhaMultipla' || tipoResposta === 'inteiro') {
+            adicionarOpcaoResposta(container, temaCount, tipoResposta);
+        }
+    }
+    
+    function adicionarOpcaoResposta(container, temaCount, tipo) {
+        // Verifica se já existe um botão "Adicionar opção" e remove-o temporariamente
+        const existingAddButton = container.querySelector('.add-option-button');
+        if (existingAddButton) {
+            container.removeChild(existingAddButton);
+        }
+        
+        const divOpcao = document.createElement('div');
+        divOpcao.classList.add('field', 'has-addons');
+        const input = document.createElement('input');
+        input.type = (tipo === 'inteiro') ? 'number' : 'text';
+        input.name = `respostaOpcao${temaCount}[]`;
+        input.placeholder = (tipo === 'inteiro') ? 'Digite um número' : 'Digite a opção de escolha';
+        input.classList.add('input');
+        input.required = true;
+        
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.innerText = '-';
+        button.classList.add('button', 'is-danger');
+        button.onclick = function() { container.removeChild(divOpcao); };
+        
+        divOpcao.appendChild(input);
+        divOpcao.appendChild(button);
+        container.appendChild(divOpcao);
+        
+        // Recria o botão "Adicionar opção" e adiciona-o de volta ao final do container
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.innerText = 'Adicionar opção';
+        addButton.classList.add('button', 'is-info', 'add-option-button'); // Adiciona uma classe para facilitar a identificação
+        addButton.onclick = function() { adicionarOpcaoResposta(container, temaCount, tipo); };
+        container.appendChild(addButton);
+    }
+    
+    function removerTemaComPergunta(temaId) {
+        const temaDiv = document.getElementById(temaId);
+        if (temaDiv) {
+            temaDiv.remove();
+        } else {
+            console.error('Elemento não encontrado:', temaId);
+        }
+    }
+    function verificarPerguntas() {
+        const perguntasInputs = document.querySelectorAll('#formularioQuestionario input[name^="perguntas"]');
+        const opcoesRespostaContainers = document.querySelectorAll('.opcoesResposta');
+        const mensagemErro = document.getElementById('mensagemErro');
+        const mensagemErroContainer = document.getElementById('mensagemErroContainer');
+        
+        const titulosExistentes = document.getElementById('formularioQuestionario').dataset.titulosExistentes.split(',').map(function(titulo) {
+            return titulo.toLowerCase();
+        });
+        
+        const descricoesExistentes = document.getElementById('formularioQuestionario').dataset.descricoesExistentes.split(',').map(function(descricao) {
+            return descricao.toLowerCase();
+        });
+        
+        
+        let valoresPerguntas = new Set();
+        let valoresOpcoes = new Set();
+        let formularioValido = true;
+        
+        mensagemErro.innerHTML = '';
+        mensagemErroContainer.style.display = 'none';
+        
+        const tituloInput = document.querySelector('#formularioQuestionario input[name="titulo"]');
+        const descricaoTextarea = document.querySelector('#formularioQuestionario textarea[name="descricao"]');
+        if (titulosExistentes.includes(tituloInput.value.trim().toLowerCase())) {
+            mensagemErro.innerHTML += 'Já existe um questionário com este título. Por favor, escolha um título diferente.<br>';
+            formularioValido = false;
+        }
+        if (descricoesExistentes.includes(descricaoTextarea.value.trim().toLowerCase())) {
+            mensagemErro.innerHTML += 'Já existe um questionário com esta descrição. Por favor, escolha uma descrição diferente.<br>';
+            formularioValido = false;
+        }
+        
+        if (perguntasInputs.length === 0) {
+            mensagemErro.innerHTML += 'Não é possível criar um questionário sem perguntas. Por favor, adicione pelo menos uma pergunta.<br>';
+            formularioValido = false;
+        }
+        perguntasInputs.forEach(input => {
+            let valorPergunta = input.value.trim().toLowerCase();
+            if (valorPergunta === '') {
+                mensagemErro.innerHTML += 'Por favor, preencha todas as perguntas antes de salvar o questionário.<br>';
+                formularioValido = false;
+            } else if (valoresPerguntas.has(valorPergunta)) {
+                mensagemErro.innerHTML += `A pergunta "${input.value.trim()}" está duplicada.<br>`;
+                formularioValido = false;
+            }
+            valoresPerguntas.add(valorPergunta);
+        });
+
+        opcoesRespostaContainers.forEach((container, index) => {
+            let opcoes = [...container.querySelectorAll('input[type="text"], input[type="number"]')];
+            let valoresOpcoes = new Set();
+            opcoes.forEach(opcao => {
+                let valorOpcao = opcao.value.trim().toLowerCase();
+                if (valoresOpcoes.has(valorOpcao)) {
+                    mensagemErro.innerHTML += `Foram encontradas opções de resposta duplicadas na pergunta: "${perguntasInputs[index].value.trim()}".<br>`;
+                    formularioValido = false;
+                }
+                valoresOpcoes.add(valorOpcao);
+            });
+        });
+        
+        // Mostra o container de mensagem se houver mensagens de erro
+        if (!formularioValido) {
+            mensagemErroContainer.style.display = 'block';
+            window.scrollTo(0, 0); // Rola para o topo para garantir que o usuário veja a mensagem
+        } else {
+            document.getElementById('formularioQuestionario').submit();
+        }
+    }
+    
+</script>
+
+
+
+{% endblock %}
+
+{% block title %}
+- Criar Questionário
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'app.html' %}
+{% block content %}
+<div style="display: flex; justify-content: flex-start; align-items: center; flex-direction: column; min-height: 100vh; padding-top: 10vh;">
+    <h2 style="font-size: 24px; margin-bottom: 20px;">Tem certeza de que deseja eliminar o questionário "{{ questionario.titulo }}"?</h2>
+    <form method="post" action="{% url 'questionario:eliminar-questionario' questionario.id %}" style="display: flex; gap: 10px;">
+        {% csrf_token %}
+        <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+            <div class="control">
+                <button type="submit" class="button is-danger is-light">Confirmar</button>
+            </div>
+            <div class="control">
+                <button type="button" class="button is-link is-light" onclick="location.href='{% url 'questionario:listar-questionario' %}'">Cancelar</button>
+            </div>
+        </div>        
+    </form>
+</div>
+{% endblock %}

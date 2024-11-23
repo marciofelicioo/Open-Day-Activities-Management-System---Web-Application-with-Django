@@ -1,0 +1,164 @@
+{% extends 'app.html' %}
+{% load django_tables2 %}
+{% load inscricoes_extras %}
+{% load static %}
+
+{% block title %}- Consultar Inscrições
+{% endblock title %}
+
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{% endblock load %}
+
+{% block scripts %}
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/datepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/numberinput/index.min.js' %}"></script>
+
+<script>
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data: {
+            min_alunos: "{{ filter.form.min_alunos.value|default_if_none:'' }}" == "" ? null : parseInt(
+                "{{ filter.form.min_alunos.value|default_if_none:'null' }}"),
+            max_alunos: "{{ filter.form.max_alunos.value|default_if_none:'' }}" == "" ? null : parseInt(
+                "{{ filter.form.max_alunos.value|default_if_none:'null' }}"),
+            moment: moment,
+        },
+        computed: {
+            dia: () => {
+                let result = moment("{{ filter.form.dia.value|default_if_none:'null' }}", "DD/MM/YYYY")
+                    .toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+        },
+        methods: {
+            reset(event) {
+                event.preventDefault();
+                this.dia = null;
+                this.min_alunos = null;
+                this.max_alunos = null;
+                const btn = $("input[type=reset]");
+                btn.closest('form').find("option[selected]").removeAttr("selected");
+                btn.closest('form').find("input[type=text], input[type=number], textarea, select").val("");
+            },
+        },
+    });
+</script>
+
+{% endblock scripts %}
+
+{% block content %}
+<div class="columns">
+    <div id="vue-app" class="column is-3">
+        <div class="menu">
+            <div class="menu-label">
+                Filtros Inscrições
+            </div>
+            <div class="menu-list content">
+                <form method="get">
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.diaaberto.name }}" value="{{filter.form.diaaberto.value}}">
+                                    {% for value, diaaberto in filter.form.fields.diaaberto.choices %}
+                                    {% if value != "" %}
+                                    <option value="{{ value }}"
+                                        {% if value|stringformat:'s' == filter.form.diaaberto.value %} selected
+                                        {% endif %}>
+                                        {{ diaaberto }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <b-field>
+                        <b-datepicker v-model="dia" :date-formatter="(d) => moment(d).format('DD/MM/YYYY')"
+                            :date-parser="(date) => moment(date, 'DD/MM/YYYY').toDate()" editable
+                            placeholder="Dia da visita" name="{{filter.form.dia.name}}" icon="calendar-today"
+                            :focused-date="moment('{{filter.form.diaaberto.value|min_date}}', 'DD/MM/YYYY').toDate()"
+                            :min-date="moment('{{filter.form.diaaberto.value|min_date}}', 'DD/MM/YYYY').toDate()"
+                            :max-date="moment('{{filter.form.diaaberto.value|max_date}}', 'DD/MM/YYYY').toDate()">
+                        </b-datepicker>
+                    </b-field>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" name="{{ filter.form.ano.name }}"
+                                value="{{ filter.form.ano.value|default_if_none:'' }}" type="number" placeholder="Ano">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" name="{{ filter.form.turma.name }}"
+                                value="{{ filter.form.turma.value|default_if_none:'' }}" type="text"
+                                placeholder="Turma">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" name="{{ filter.form.areacientifica.name }}"
+                                value="{{ filter.form.areacientifica.value|default_if_none:'' }}" type="text"
+                                placeholder="Área Científica">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <input type="hidden" name="{{filter.form.min_alunos.name}}" :value="min_alunos">
+                    <input type="hidden" name="{{filter.form.max_alunos.name}}" :value="max_alunos">
+                    <b-field style="margin-bottom: 0">
+                        <b-numberinput v-model="min_alunos" placeholder="Mín. Participantes" controls-position="compact"
+                            min="0">
+                        </b-numberinput>
+                    </b-field>
+                    <b-field style="margin-bottom: 0">
+                        <b-numberinput v-model="max_alunos" placeholder="Máx. Participantes" controls-position="compact"
+                            min="0">
+                        </b-numberinput>
+                    </b-field>
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            <input class="button is-light is-fullwidth" type="reset" @click="reset" value="Limpar">
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <nav aria-label="breadcrumbs" class="breadcrumb">
+            <ul>
+                <li><a href="{% url 'home' %}">Início</a></li>
+                <li class="is-active"><a href="{% url 'inscricoes:consultar-inscricoes-participante' %}">Inscrições</a>
+                </li>
+            </ul>
+        </nav>
+        {% render_table table 'inscricoes/consultar_inscricoes_tabela.html' %}
+    </div>
+</div>
+{% endblock content %}

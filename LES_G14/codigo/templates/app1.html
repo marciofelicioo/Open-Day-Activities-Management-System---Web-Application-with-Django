@@ -1,0 +1,105 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-pt">
+
+<head>
+
+  <title>
+    Dia Aberto {% block title %} {% endblock title %}
+
+  </title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
+  <link rel="stylesheet" href="{% static 'css/materialdesignicons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive-tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animated-arrows.css' %}">
+  <link rel="icon" href="{% static 'img/logo.png' %}" />
+    
+  {% block load %}
+  {% endblock load %}
+
+  <style>
+    body,
+    html {
+      min-height: 100%;
+      background-size: cover;
+      background: linear-gradient(to bottom, #ffffff, #eeeeff) no-repeat fixed center center;
+    }
+
+    * {
+      outline: none;
+    }
+
+    #app {
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 5rem
+    }
+
+    #top-hero-body {
+      height: 45vh;
+    }
+
+    #page-content {
+      margin: -37vh 5vw 0
+    }
+
+    #page-content .card {
+      min-height: 70vh
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: #fafafa;
+      padding: 1rem 3rem;
+    }
+
+    .step-item.is-completed {
+      cursor: pointer;
+    }
+
+    .step-item.is-active {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    {% include 'popup.html'  %}
+    {% include 'navbar.html' %}
+    <div class="hero is-primary is-bold" id="top-hero">
+      <div id="top-hero-body" class="hero-body"></div>
+    </div>
+    <div id="page-content">
+      <div class="card">
+        <div class="card-content">
+          {% block content %}
+          <!-- include the content here-->
+          {% endblock content %}
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div style="margin: auto; width: max-content">
+        &#169; 2021 Dia Aberto UAlg (Grupos 1 e 6)
+      </div>
+    </footer>
+  </div>
+
+  <script type="text/javascript" src="{% static 'js/fontawesome.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/animated-arrows.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/js_custom.js' %}"></script>
+  {% block scripts %}
+  {% endblock scripts %}
+</body>
+
+</html>

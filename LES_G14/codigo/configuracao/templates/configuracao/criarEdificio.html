@@ -1,0 +1,207 @@
+
+{% extends 'app.html' %}
+{% load static %}
+{% block content %}
+{% load configuracao_tags %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+	<ul>
+	<li><a href="{% url 'home' %}">Início</a></li>
+	<li><a href="{% url 'configuracao:verEdificios' %}">Edificios</a></li>
+	</ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+	<form method="post" enctype="multipart/form-data">
+		<div id="id_removed_rows" style="display:none;"></div>
+		{% csrf_token %}
+    {% if form.non_field_errors %}
+      <article class="message is-danger">
+        <div class="message-body">
+          <p style="text-align: center;">
+          {% for error in form.non_field_errors %}
+            <strong>{{ error|escape }}</strong>
+          {% endfor %}
+          </p>
+        </div>
+      </article>
+    {% endif %}
+		<div class="b-steps">
+			<section class="step-content">
+				<div class="step-item">
+					<div style="padding: 1rem 2vw 0px">
+						<h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Edificio</h2>
+
+						<div class="columns">
+							<div class="column">
+								<strong>{{form.nome.errors}}</strong>
+								<div class="field">
+									<label class="label">Nome</label>
+									<div class="control">
+										{{form.nome}}
+									</div>
+								</div>
+							</div>
+							<div class="column is-one-quarter">
+								<strong>{{form.campus.errors}}</strong>
+								<div class="field">
+								<label class="label">Campus</label>
+								<div class="control">
+									<span class="select is-fullwidth is-empty">
+										{{form.campus}}
+									</span>
+								</div>
+								</div>
+							</div>
+							<div class="column ">
+							<label class="label">Imagem</label>
+								<div id="file-js-example" class="file has-name ">
+								<label class="file-label">
+									<input class="file-input" type="file" name="image" accept="image/*" id="id_image">
+									<span class="file-cta">
+									<span class="file-icon">
+										<i class="fas fa-upload"></i>
+									</span>
+									<span class="file-label">
+										Escolha uma imagem…
+									</span>
+									</span>
+									<span class="file-name">
+									Nenhuma imagem escolhida...
+									</span>
+								</label>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">Espaços</h2>
+						<div class='table'>
+							<div class='table-wrapper'>
+								{{formset.management_form}}
+								<table class="table has-mobile-cards is-hoverable is-fullwidth" id='table01'>
+									<thead>
+										<tr>
+											<th style="cursor: pointer; width: 20%">Nome</th>
+											<th style="cursor: pointer; width: 20%" >Andar</th>
+											<th style="cursor: pointer">Descrição</th>
+										</tr>
+									</thead>
+									<tbody id='tableBody-01'>
+									{% for form in formset %}
+									{{form.non_field_errors}}
+										<tr>
+											{{form.id}}
+											{% for field in form.visible_fields  %}
+												{% if field.name != "DELETE" %}
+													{% for error in field.errors %}
+														<div class="alert alert-danger">
+															<strong>{{field.label|escape}} {{ error|escape }}</strong>
+														</div>
+													{% endfor %}
+													
+														<td data-label="{{field.label}}">
+															{% if field.label != "Descricao" %}
+																{{field|force_required|safe}}
+															{% else %}
+																{{field}}
+															{% endif %}
+														</td>
+													
+												{% endif %}
+											{% endfor %}
+										</tr>
+									{% endfor %}
+									</tbody>
+								</table>
+								<a role="button" type="button" class="button" id="add-more-rows">
+									<span>Adicionar Linha</span>
+								<span class="icon is-small">
+									<i class="mdi mdi-plus mdi-24px"></i>
+								</span>
+							</a>
+							<a id="del-row" role="button" type="button" class="button">
+								<span>Remover Linha</span>
+									<span class="icon is-small">
+										<i class="mdi mdi-trash-can-outline mdi-24px" style="color: #ff0000"></i>
+									</span>
+								</a>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="column is-8 is-offset-2">
+						<div class="level">
+							<div class="level-left">
+								<a class="button is-large is-outlined" type="button" href="{% url 'configuracao:verEdificios' %}">
+								<span>Cancelar</span>
+								</a>
+							</div>
+							<div class="level-right">
+								<button class="button is-large is-success is-outlined is-link" type="submit">
+								<span>Confirmar</span>
+								<span class="icon is-medium">
+									<i class="mdi mdi-check mdi-36px"></i>
+								</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</form>
+</div>
+<style>
+	.label {
+	font-weight: normal;
+}
+.b-steps .steps .step-items .step-item .step-details .step-title {
+	font-size: 1rem;
+}
+</style>
+{% endblock content %}
+{% block scripts %}
+<script>
+	$("#add-more-rows").click(function(){
+	var value = $("#id_form-TOTAL_FORMS").val();
+	value = Number(value) + Number('1');
+	document.getElementById("id_form-TOTAL_FORMS").value = value;
+	$.ajax({
+		url: "{% url 'configuracao:ajaxAddEspacoRow' %}",
+		method: "POST",
+		data: {
+			'extra': value,
+			csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+		},
+		success: function(data){
+			$("#tableBody-01").append(data);
+		}
+	});
+})
+$('#del-row').click(function(e){
+	var value = $("#id_form-TOTAL_FORMS").val();
+	var initial = $("#id_form-INITIAL_FORMS").val();
+	var rowCount = $('#tableBody-01 tr').length;
+	if(Number(value) > Number(initial) && Number(value) > 1) {
+		$('#table01 tr:last').remove();
+		value = Number(value) - Number('1');
+		document.getElementById("id_form-TOTAL_FORMS").value = value;
+	} else if(rowCount > 1){
+		var id = Number($('#table01 tr:last input').attr('id').split('-')[1])
+		var form_delete = 'form-'+id+'-DELETE';
+		var delete_ = "<input type='hidden' name='"+form_delete+"' id='id_"+form_delete+"' value='on'>";
+		$('#table01 tr:last').append(delete_);
+		$('#table01 tr:last').hide();
+		$('#table01 tr:last').appendTo("#id_removed_rows");
+	} else {
+		alert.warning("Não pode eliminar todas as salas");
+	}
+})
+  const fileInput = document.querySelector('#file-js-example input[type=file]');
+  fileInput.onchange = () => {
+    if (fileInput.files.length > 0) {
+      const fileName = document.querySelector('#file-js-example .file-name');
+      fileName.textContent = fileInput.files[0].name;
+    }
+  }
+
+</script>
+{% endblock scripts %}

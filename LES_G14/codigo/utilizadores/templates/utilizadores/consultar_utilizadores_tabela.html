@@ -1,0 +1,76 @@
+{% extends 'bulma_table_details.html' %}
+{% load poll_extras %}
+
+{% block details_content %}
+
+<table>
+    <tbody>
+        <tr>
+            <td><strong>Nome Próprio:</strong></td>
+            <td>{{row.record.first_name}}</td>
+        </tr>
+        <tr>
+            <td><strong>Apelido:</strong></td>
+            <td>{{row.record.last_name}}</td>
+        </tr>
+        <tr>
+            <td><strong>Username:</strong></td>
+            <td>{{row.record.username}}</td>
+        </tr>
+        <tr>
+            <td><strong>Contacto:</strong></td>
+            <td>{{row.record.contacto}}</td>
+        </tr>
+        <tr>
+            <td><strong>Email:</strong></td>
+            <td>{{row.record.email}}</td>
+        </tr>
+        {% if row.record|has_group:"ProfessorUniversitario" %}
+        <tr>
+            <td><strong>Faculdade:</strong></td>
+            <td>{{row.record|get_faculdade_pu:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Departamento:</strong></td>
+            <td>{{row.record|get_departamento_pu:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Gabinete:</strong></td>
+            <td>{{row.record|get_gabinete_pu:row.record.id}}</td>
+        </tr>
+        {% elif row.record|has_group:"Coordenador" %}
+        <tr>
+            <td><strong>Faculdade:</strong></td>
+            <td>{{row.record|get_faculdade_coord:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Departamento:</strong></td>
+            <td>{{row.record|get_departamento_coord:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Gabinete:</strong></td>
+            <td>{{row.record|get_gabinete_coord:row.record.id}}</td>
+        </tr>
+        {% elif row.record|has_group:"Colaborador" %}
+        <tr>
+            <td><strong>Faculdade:</strong></td>
+            <td>{{row.record|get_faculdade_colaborador:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Departamento:</strong></td>
+            <td>{{row.record|get_departamento_colaborador:row.record.id}}</td>
+        </tr>
+        <tr>
+            <td><strong>Curso:</strong></td>
+            <td>{{row.record|get_curso_colaborador:row.record.id}}</td>
+        </tr>
+        {% elif row.record|has_group:"Administrador" %}
+        <tr>
+            <td><strong>Gabinete:</strong></td>
+            <td>{{row.record|get_gabinete_admin:row.record.id}}</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% endblock details_content %}

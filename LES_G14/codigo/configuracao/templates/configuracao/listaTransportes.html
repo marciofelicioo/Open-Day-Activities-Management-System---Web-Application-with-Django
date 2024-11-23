@@ -1,0 +1,102 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load l10n %}
+{% load configuracao_tags %}
+{% load django_tables2 %}
+<div class="columns">
+    <div class="column is-3">
+        <form method="get">
+            <div class="menu">
+                <p class="menu-label">Filtros Edificio</p>
+                <ul class="menu-list">
+                    <div class="field">
+                        <!---->
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_identificador' type='text' name='identificador' value="{{filter.form.identificador.value|default_if_none:''}}" placeholder="Identificador">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.de.name }}"
+                                    value="{{filter.form.de.value}}">
+                                    <option value="">De qualquer</option>
+                                    {% for value, campus in campi %}
+                                        {% if value != "" %}
+                                        <option value="{{ value }}"
+                                            {% if value|stringformat:'s' == filter.form.de.value %} selected
+                                            {% endif %}>
+                                            De {{ campus }}
+                                        </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.para.name }}"
+                                    value="{{filter.form.para.value}}">
+                                    <option value="">Para qualquer</option>
+                                    {% for value, campus in campi %}
+                                        {% if value != "" %}
+                                        <option value="{{ value }}"
+                                            {% if value|stringformat:'s' == filter.form.para.value %} selected
+                                            {% endif %}>
+                                            Para {{ campus }}
+                                        </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                </ul>
+                <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <a type="button" role="button" href="{% url 'configuracao:verTransportes' %}" class="button is-light is-fullwidth">Limpar</a>
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                </div>
+            </div>     
+        </form>
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+              <li><a href="#">Início</a></li>
+              <li class="is-active"><a href="#" aria-current="page">Transportes</a></li>
+            </ul>
+        </nav>
+        <a class="button is-success is-outlined" type="button" style="margin-bottom:0.5rem" href="{% url 'configuracao:criarTransporte'%}">     
+            <span class="icon is-small">
+                <i class="mdi mdi-plus"></i>
+            </span>
+            <span>Criar Transporte</span>
+        </a> 
+        {% render_table table %}
+    </div>  
+</div>
+
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}

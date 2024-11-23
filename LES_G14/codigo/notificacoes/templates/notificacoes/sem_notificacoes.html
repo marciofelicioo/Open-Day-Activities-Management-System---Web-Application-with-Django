@@ -1,0 +1,170 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+{% extends 'app.html' %}
+
+{% block title %}- Notificações{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/notificacoes.css' %}">
+{% endblock load %}
+{% load poll_extras %}
+{% load notificacoes_extras %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a>Notificações</a></li>
+        </ul>
+    </nav>
+    <div class="columns" id="mail-app">
+        <aside class="column is-2 aside hero is-fullheight">
+            <div>
+                <div class="compose has-text-centered">
+                    <a href="{% url 'notificacoes:enviar-notificacao' %}" class="button is-danger is-block is-bold">
+                        <span class="compose">Enviar Mensagem</span>
+                    </a>
+                </div>
+                <div class="main">
+                    {% if categoria == 0 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="item active"><span
+                            class="name">Tudo</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="item"><span
+                            class="name">Tudo</span></a>
+                    {% endif %}
+                    {% if categoria == 1 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 1 0 %}" class="item active"><span
+                            class="name">Não Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 1 0 %}" class="item"><span
+                            class="name">Não Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 2 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 2 0 %}" class="item active"><span
+                            class="name">Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 2 0 %}" class="item"><span
+                            class="name">Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 3 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 3 0 %}" class="item active"><span
+                            class="name">Individuais</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 3 0 %}" class="item"><span
+                            class="name">Individuais</span></a>
+                    {% endif %}
+                    {% if categoria == 4 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 4 0 %}" class="item active"><span
+                            class="name">Grupos</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 4 0 %}" class="item"><span
+                            class="name">Grupos</span></a>
+                    {% endif %}
+                    {% if categoria == 5 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 5 0 %}" class="item active"><span
+                            class="name">Informativas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 5 0 %}" class="item"><span
+                            class="name">Informativas</span></a>
+                    {% endif %}
+                    {% if categoria == 6 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 6 0 %}" class="item active"><span
+                            class="name">Alertas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 6 0 %}" class="item"><span
+                            class="name">Alertas</span></a>
+                    {% endif %}
+                    {% if categoria == 7 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 7 0 %}" class="item active"><span
+                            class="name">Cancelamentos</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 7 0 %}" class="item"><span
+                            class="name">Cancelamentos</span></a>
+                    {% endif %}
+                    {% if categoria == 8 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 8 0 %}" class="item active"><span
+                            class="name">Validações</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 8 0 %}" class="item"><span
+                            class="name">Validações</span></a>
+                    {% endif %}</d iv>
+                </div>
+        </aside>
+        <div class="column is-4 messages hero is-fullheight">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    <a href="#" class="button is-small"><div data-tooltip="Marcar notificações como lidas"><i class="mdi mdi-email-mark-as-unread mdi-18px"></i></div></a>
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' categoria 0 %}" class="button is-small">
+                        <i class="mdi mdi-reload mdi-18px"></i>
+                    </a>
+                </div>
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="button is-small"><i class="fa fa-inbox"></i></a>
+                    <a class="button is-small"><div data-tooltip="Click em Enviar Mensagem para comunicar diretamente com um utilizador"><i class="fa fa-question-circle"></i></div></a>
+                    <a class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+
+
+                <div class="control is-grouped pg">
+                    <div class="title">0-0 de
+                        {{ notificacoes|length }}
+                    </div>
+                    {% if utilizadores.has_previous %}
+                    <a class="button is-link" href="?page={{notificacoes.previous_page_number}}"><i
+                            class="fa fa-chevron-left"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-left"></i></a>
+                    {% endif %}
+                    {% if utilizadores.has_next %}
+                    <a class="button is-link" href="?page={{notificacoes.next_page_number}}"><i
+                            class="fa fa-chevron-right"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="inbox-messages" id="inbox-messages">
+
+                <div class="card">
+
+                    <div class="card-content">
+                        <strong>Não existem notificações</strong>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="column is-6 message hero is-fullheight is-active" id="message-pane">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="button is-small"><i class="fa fa-inbox"></i></a>
+                    <a class="button is-small"><div data-tooltip="Click em Enviar Mensagem para comunicar diretamente com um utilizador"><i class="fa fa-question-circle"></i></div></a>
+                    <a class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+
+            </div>
+            <div class="box message-preview">
+                <div class="top">
+                    <strong>Não existem notificações</strong>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

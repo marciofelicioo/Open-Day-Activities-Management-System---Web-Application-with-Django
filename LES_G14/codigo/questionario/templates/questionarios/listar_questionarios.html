@@ -1,0 +1,94 @@
+{% extends 'app.html' %}
+{% load django_tables2 %}
+{% block content %}
+<div class="columns">
+    <div class="column is-3">
+        <form method="get" action="{% url 'questionario:listar-questionario' %}">
+            <div class="menu">
+                <p class="menu-label">Filtros Questionários</p>
+                <ul class="menu-list">
+                    <!-- Filtro por Data -->
+                    <div class="field">
+                        <label for="id_data">Data de Criação:</label>
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_data' type='date' name='data' value="{{ request.data|default:'' }}">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-calendar-range mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Filtro por Título -->
+                    <div class="field">
+                        <label for="id_titulo">Título:</label>
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_titulo' type='text' name='titulo' value="{{ request.titulo|default_if_none:'' }}" placeholder="Título">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-file-document-outline mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtro por Estado -->
+                    <div class="field">
+                        <label>Estado:</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="estado">
+                                    <!-- A opção 'Todos' será selecionada se nenhum estado específico for escolhido -->
+                                    <option value="" {% if not filter.form.estado.value %}selected{% endif %}>--------</option>
+                                    {% for value, label in filter.form.fields.estado.choices %}
+                                        {% if value %}
+                                            <!-- As opções específicas de estado são listadas aqui -->
+                                            <option value="{{ value }}" {% if filter.form.estado.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>   
+                        </p>
+                    </div>
+                </div>     
+            </form>      
+        </div>
+        <div class="column">
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{% url 'home' %}">Início</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Questionários</a></li>
+                </ul>
+            </nav>
+            <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                <a href="{% url 'questionario:criar-questionario' %}" class="button is-success is-outlined" type="button">
+                    <span class="icon is-small">
+                        <i class="mdi mdi-plus"></i>
+                    </span>
+                    <span>Criar Questionário</span>
+                </a>     
+                <div style="margin-left: auto; margin-right: auto; width: fit-content;">
+                    {% if data_fim_diaaberto %}
+                        <a href="{% url 'configuracao:diasAbertos' %}" class="button is-danger is-outlined" type="button">
+                            <span>Data Fim de Dia Aberto Atual: {{ data_fim_diaaberto }}</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'configuracao:diasAbertos' %}" class="button is-danger is-outlined" type="button">
+                            <span>Nenhum Dia Aberto para o ano atual</span>
+                        </a>
+                    {% endif %}
+                </div>                
+            </div>
+            <div style="max-height: 400px; overflow-y: auto; overflow-x: auto;">
+                {% render_table table %}
+            </div>
+        </div>
+    </div>
+    {% endblock content %}
+    

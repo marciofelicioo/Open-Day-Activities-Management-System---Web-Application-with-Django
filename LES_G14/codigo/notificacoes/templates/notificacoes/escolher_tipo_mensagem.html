@@ -1,0 +1,113 @@
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Mensagens{% endblock title %}
+
+
+
+{% block content %}
+
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a>Mensagens</a></li>
+        </ul>
+    </nav>
+
+    <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-account"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Escolher Tipo</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="step-details">
+
+                    <p class="step-title">Escrever Mensagem</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div style="margin-bottom:5%;margin-top:5%;">
+            <h2 class="title is-5" style="text-align: center;">Por favor selecione o tipo de mensagem que pretende
+                enviar</h2>
+        </div>
+        <div class="columns is-mobile is-centered">
+            <div class="column is-narrow">
+                <div class="buttons has-addons">
+
+                    <a href="{% url 'notificacoes:escrever-mensagem' 0 %}">
+                        <button class="button">Mensagem individual</button>
+                    </a>
+                    <a href="{% url 'notificacoes:escrever-mensagem' 1 %}">
+                        <button class="button">Mensagem para um grupo</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" value="Voltar" class="button is-outlined" style="margin-left: 10%;margin-top:10%;"
+        onclick="history.back();">Voltar</button>
+
+</div>
+{% endblock content %}

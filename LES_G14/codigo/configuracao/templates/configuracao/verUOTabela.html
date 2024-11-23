@@ -1,0 +1,23 @@
+{% extends 'bulma_table_details.html' %}
+
+
+{% block details_content %}
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>Departamento</th>
+            <th>Sigla</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for dep in row.record.dep_ %}
+        <tr>
+            <td data-label="Nome">{{dep.nome}}</td>
+            <td data-label="Sigla">{{dep.sigla}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock details_content %}

@@ -1,0 +1,165 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load django_tables2 %}
+<div class="columns">
+       <div class="column is-3">
+{% csrf_token %}
+
+
+ <form method="get">
+            <div class="menu">
+                <p class="menu-label">Filtros Atividades</p>
+                <ul class="menu-list">
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.departamento_id.name }}"
+                                    value="{{filter.form.departamento_id.value}}" id="id_{{ filter.form.departamento_id.name }}">
+                                    <option value="">Qualquer Departamento</option>
+                                    {% for value, dep in deps %}
+                                        {% if value != "" %}    
+                                        <option value="{{ value }}"
+                                            {% if value|stringformat:'s' == filter.form.departamento_id.value %} selected
+                                            {% endif %}>
+                                            {{ dep }}
+                                        </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <div class="select is-fullwidth">
+                                <select name="{{ filter.form.tipo.name }}"
+                                    value="{{filter.form.tipo.value}}">
+                                    <option value="" >Qualquer Tipo</option>
+                                    <option value="Tertulia" {% if filter.form.tipo.value == 'Tertulia' %}selected{% endif %}>Tertulia</option>
+                                    <option value="Palestra" {% if filter.form.tipo.value == 'Palestra' %}selected{% endif %}>Palestra</option>
+                                    <option value="Atividade Laboratorial" {% if filter.form.tipo.value == 'Atividade Laboratorial' %}selected{% endif %}>Atividade Laboratorial</option>
+                                </select>
+                            </div>
+                            
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                            
+                        </div>
+                    </div>
+                
+                    <div class="field">
+                        <!---->
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_nome' type='text' name='nome' value="{{filter.form.nome.value|default_if_none:''}}" placeholder="Nome">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                </ul>
+                <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <a type="button" role="button" href="{% url 'colaboradores:preferencia-atividade' %}" class="button is-light is-fullwidth">Limpar</a>
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                </div>
+            </div>     
+        </form>
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+              <li><a href="#">Início</a></li>
+              <li class="is-active"><a href="#" aria-current="page">Escolher Atividades</a></li>
+            </ul>
+          </nav>
+          
+        <a href="{% url 'colaboradores:atividades-escolhidas' %}">
+            <button type="button" class="button is-success is-outlined" style="margin-bottom: 1rem;">
+            {% comment %} <span class="icon is-small"><i class="mdi mdi-plus"></i></span>  {% endcomment %}
+            <span>Ver atividades escolhidas</span>
+            </button>
+        </a>
+        {% render_table table 'colaboradores/tabelacolaborador.html' %}
+    </div>
+    
+</div>
+<div style="margin-top:2%;text-align:center;position:center;">
+    <a href="{% url 'colaboradores:preferencia-atividade' %}">
+        <button type="button" value="Voltar" class="button is-outlined" style="margin-right:5%">Voltar</button>
+    </a>
+    <a href="{% url 'colaboradores:concluir-disponibilidade' %}">
+    <button style="" class="button is-success is-outlined">
+        <span>Continuar</span>
+    </button>
+    </a>
+</div>
+<style>
+.dialog .modal-card .modal-card-body.is-titleless {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+tr.detail{
+    padding:1rem;
+}
+.table tr.detail{
+    -webkit-box-shadow:inset 0 1px 3px #dbdbdb;
+    box-shadow:inset 0 1px 3px #dbdbdb;
+    background:#fafafa
+}
+</style>
+{% endblock content %}
+{% block scripts%}
+<script>
+
+ $(document).ready(function(){
+            var value_uo= "{{ filter.form.uo_id.value }}";
+            var value_dep= "{{filter.form.departamento_id.value}}";
+            $.ajax({
+            url:"{% url 'colaboradores:ver-departamentos' %}",
+            method: 'POST',
+            data: {
+                'value_uo': value_uo,
+                'value_dep': value_dep,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(), 
+            },
+            success: function(data){
+                $("#id_{{ filter.form.departamento_id.name }}").html(data)
+                }
+            })
+    });
+
+
+    $("#id_{{ filter.form.uo_id.name }}").change(function()
+    {
+        var value_uo= $(this).val();
+        $.ajax({
+            url:"{% url 'colaboradores:ver-departamentos' %}",
+            method: 'POST',
+            data: {
+                'value_uo': value_uo,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(), 
+            },
+            success: function(data){
+                $("#id_{{ filter.form.departamento_id.name }}").html(data)
+
+            }
+
+        })
+
+    })
+</script>
+{% endblock scripts%}

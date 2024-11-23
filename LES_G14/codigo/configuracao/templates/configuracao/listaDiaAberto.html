@@ -1,0 +1,84 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load l10n %}
+{% load django_tables2 %}
+<div class="columns">
+    <div class="column is-3">
+        <form method="get">
+            <div class="menu">
+                <p class="menu-label">Filtros Edificio</p>
+                <ul class="menu-list">
+                    <div class="field">
+                        <!---->
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_ano' type='text' name='ano' value="{{filter.form.ano.value|default_if_none:''}}" placeholder="Ano">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                    <div class="field">
+                        <!---->
+                        {{filter.form.diainicio.label}}
+                        <div class="control has-icons-left is-clearfix">
+                            <input class='input' id='id_diainicio' type='date' name='diainicio' value="{{filter.form.diainicio.value|default_if_none:''}}">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                    <div class="field">
+                        {{filter.form.diafim.label}}
+                        <div class="control has-icons-left is-clearfix">
+                            
+                            <input class='input' id='id_diafim' type='date' name='diafim' value="{{filter.form.diafim.value|default_if_none:''}}" placeholder="Identificador">
+                            <span class="icon is-left">
+                                <i class="mdi mdi-magnify mdi-24px"></i>
+                            </span>
+                        </div>
+                        <!---->
+                    </div>
+                </ul>
+                <div class='field is-grouped' style='margin-top: 5px'>
+                        <p class="control is-expanded">
+                            <a type="button" role="button" href="{% url 'configuracao:diasAbertos' %}" class="button is-light is-fullwidth">Limpar</a>
+                        </p>
+                        <p class="control is-expanded">
+                            <button class="button is-primary is-fullwidth" type="submit">
+                                <span class="icon">
+                                    <i class="mdi mdi-magnify"></i>
+                                </span>
+                                <span>Pesquisar</span>
+                            </button>
+                        </p>
+                </div>
+            </div>     
+        </form>
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+              <li><a href="#">Início</a></li>
+              <li class="is-active"><a href="#" aria-current="page">Dias Abertos</a></li>
+            </ul>
+          </nav>
+        {% if is_open == True %}
+        <input type="hidden" id="novoDia" value="{% url 'configuracao:novoDia'%}">  
+        <a onclick="alert.warning('Não pode criar um novo Dia Aberto enquanto existe outro pendente');" class="button is-success is-outlined" type="button" style="margin-bottom:0.5rem" >     
+        {% else %}
+        <a class="button is-success is-outlined" type="button" style="margin-bottom:0.5rem" href="{% url 'configuracao:novoDia'%}">     
+        {% endif %}
+            <span class="icon is-small">
+                <i class="mdi mdi-plus"></i>
+            </span>
+            <span>Criar novo Dia Aberto</span>
+        </a>   
+        {% render_table table 'configuracao/verDiaTabela.html' %}
+    </div>
+</div>
+
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}

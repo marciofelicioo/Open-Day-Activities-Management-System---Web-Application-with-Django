@@ -1,0 +1,25 @@
+    <tr>
+        <input type="hidden" name="{{form_id}}" id="id_{{form_id}}">
+
+        <td data-label="Dia">
+            <span class="select is-fullwidth is-empty">
+                <select type="text" name="{{form_dia}}" class="input" maxlength="32" id="id_{{form_dia}}">
+                    <option value="" selected="">Escolha o dia</option>
+
+                    {% for dia in dias %}
+                    <option value="{{ dia|date:'Y-m-d'}}">{{ dia}}</option>
+                    {% endfor %}
+
+                </select>
+            </span>
+        </td>
+
+        <td data-label="Inicio">
+            <input type="time" name="{{form_inicio}}" class="input" id="id_{{form_inicio}}">
+        </td>
+    
+        <td data-label="Fim">
+            <input type="time" name="{{form_fim}}" class="input" id="id_{{form_fim}}">
+        </td>
+
+    </tr>

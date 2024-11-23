@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+{% load static %}
+{% load inscricoes_extras %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição no Dia Aberto {{ano}} - Universidade do Algarve</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @frame footer_frame {
+                /* Static frame */
+                -pdf-frame-content: footer_content;
+                left: 50pt;
+                width: 512pt;
+                top: 772pt;
+                height: 20pt;
+            }
+        }
+
+        .section-header {
+            text-align: center;
+            padding: 3px;
+            padding-top: 10px;
+            background-color: #eee;
+            border: 1px solid #000;
+            font-weight: bold;
+        }
+
+        .responsaveis-table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .responsaveis-table td {
+            padding: 3px;
+            padding-top: 2px;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .responsaveis-table thead th {
+            padding-left: 6px;
+            padding-top: 4px;
+            vertical-align: bottom;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-top: 1px solid #000;
+            text-align: left;
+        }
+
+        .inscricao-table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .inscricao-table td {
+            padding: 3px;
+            padding-top: 6px;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .inscricao-table thead th {
+            padding-top: 4px;
+            vertical-align: bottom;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-top: 1px solid #000;
+            background-color: #eee
+        }
+
+        .escola-table {
+            width: 100%;
+            max-width: 100%;
+            {% if inscricao.individual %}margin-bottom: 15px;{% endif %}
+        }
+
+        .escola-table td {
+            padding: 3px;
+            padding-top: 6px;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .escola-table thead th {
+            padding-top: 4px;
+            vertical-align: bottom;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-top: 1px solid #000;
+            background-color: #eee
+        }
+
+        .turma-table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .turma-table td {
+            padding: 3px;
+            padding-top: 6px;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .turma-table thead th {
+            padding-top: 4px;
+            vertical-align: bottom;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            border-top: 1px solid #000;
+            background-color: #eee
+        }
+
+        .sessoes-table {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .sessoes-table th,
+        .sessoes-table td {
+            padding: 3px;
+            padding-top: 6px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .sessoes-table thead th {
+            vertical-align: bottom;
+            border-bottom: 1.2px solid #000;
+            background-color: #eee
+        }
+
+        .has-text-centered {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="footer_content">Inscrição no Dia Aberto da UAlg {{ano}} - página
+        <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
+    <img src="{{ 'img/ualg-logo.png'|get64 }}" alt="Ualg Logo" height="100">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img class="has-text-centered" src="{{ 'img/logo-large.png'|get64 }}" alt="Dia Aberto Logo" height="100">
+    <pdf:spacer height="20px" />
+    <h1 class="has-text-centered">Inscrição no Dia Aberto {{ano}} - Universidade do Algarve</h1>
+
+    <!-- TABELA RESPONSÁVEIS -->
+    <div class="section-header">INFORMAÇÃO DO RESPONSÁVEL</div>
+    <table class="responsaveis-table">
+        <thead>
+            <tr>
+                <th>Nome:</th>
+                <th>E-mail:</th>
+                <th>Telemóvel/Telefone:</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{inscricao.responsavel_set.first.nome}}</td>
+                <td>{{inscricao.responsavel_set.first.email}}</td>
+                <td>{{inscricao.responsavel_set.first.tel}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- TABELA INSCRICAO -->
+    <div class="section-header">INFORMAÇÃO DA INSCRIÇÃO</div>
+    <table class="inscricao-table">
+        <thead>
+            <tr>
+                <th width="50%">Dia da Visita</th>
+                <th>Nº Participantes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="50%">{{inscricao.dia}}</td>
+                <td>{{inscricao.nalunos}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- TABELA INSCRICAO -->
+    <div class="section-header">INFORMAÇÃO DA ESCOLA</div>
+    <table class="escola-table">
+        <thead>
+            <tr>
+                <th width="60%">Nome da Escola</th>
+                <th>Localidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="60%">{{inscricao.escola.nome}}</td>
+                <td>{{inscricao.escola.local}}</td>
+            </tr>
+        </tbody>
+    </table>
+    {% if not inscricao.individual %}
+    <!-- TABELA TURMA -->
+    <table class="turma-table">
+        <thead>
+            <tr>
+                <th width="20%">Ano</th>
+                <th width="20%">Turma</th>
+                <th>Área Científica</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="20%">{{inscricao.ano}}º</td>
+                <td width="20%">{{inscricao.turma}}</td>
+                <td>{{inscricao.areacientifica}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% endif %}
+
+    <!-- TABELA TRANSPORTE -->
+    <div class="section-header">INFORMAÇÃO DO TRANSPORTE</div>
+    <table class="turma-table">
+        <thead>
+            <tr>
+                <th width="25%">Meio de transporte</th>
+                <th width="15%">Hora de chegada</th>
+                <th>Local de Chegada</th>
+                <th width="15%">Entrecampi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="25%">{{inscricao.get_meio_transporte_display}}</td>
+                <td width="15%">{{inscricao.hora_chegada|default_if_none:'---'}}</td>
+                <td>{{inscricao.local_chegada|default_if_none:'---'}}</td>
+                <td width="15%">{% if inscricao.entrecampi %}Sim{% else %}Não{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- TABELA ALMOÇOS -->
+    <div class="section-header">INFORMAÇÃO DOS ALMOÇOS</div>
+    <table class="turma-table">
+        <thead>
+            <tr>
+                <th>Campus</th>
+                <th width="30%">Nº alunos (1.60€)</th>
+                <th width="30%">Nº docentes (2.00€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{% if inscricao.inscricaoprato_set.first %}{{inscricao.inscricaoprato_set.first.campus}}{% else %}---{% endif %}
+                </td>
+                <td width="30%">
+                    {% if inscricao.inscricaoprato_set.first %}{{inscricao.inscricaoprato_set.first.npratosalunos}}{% else %}---{% endif %}
+                </td>
+                <td width="30%">
+                    {% if inscricao.inscricaoprato_set.first %}{{inscricao.inscricaoprato_set.first.npratosdocentes}}{% else %}---{% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pdf:nextpage />
+
+    <!-- TABELA SESSÕES -->
+    <div class="section-header">INFORMAÇÃO DAS SESSÕES</div>
+    <table class="sessoes-table">
+        <thead>
+            <tr>
+                <th>Horário</th>
+                <th width="45%">Atividade</th>
+                <th>Nº Inscritos</th>
+                <th width="30%">Sala</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscricaosessao in inscricao.inscricaosessao_set.all %}
+            <tr>
+                <td>{{inscricaosessao.sessao.horarioid.inicio}} - {{inscricaosessao.sessao.horarioid.fim}}</td>
+                <td width="45%">{{inscricaosessao.sessao.atividadeid.nome}}</td>
+                <td>{{inscricaosessao.nparticipantes}}</td>
+                <td width="30%">{% sala request inscricaosessao.sessao.atividadeid %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

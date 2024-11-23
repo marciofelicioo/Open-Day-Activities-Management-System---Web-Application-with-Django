@@ -1,0 +1,47 @@
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Atividade</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    {% if ativ%}
+                    <select name="atividade" onchange="diasSelect();" id="id_atividade">
+                        <option selected value='{{ativ.id}}'>{{ativ.nome}}</option>
+                            {% for option in options %}
+                                {% if option.id != ativ.id %}
+                                    <option  value="{{ option.id}}">{{ option.nome }}</option>
+                                {% endif %}
+                            {% endfor %}
+                    </select>    
+                    {% else %}
+                        {{form.atividade}}
+                    {% endif %}  
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Dia</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="dia" onchange="sessoesSelect()" id="id_dia">
+                        <option value="" selected>Escolha o dia</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>   
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Sessão</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="sessao" onchange="colaboradoresSelect()" id="id_sessao">
+                        <option value="" selected>Escolha a sessão</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>           
+</div>

@@ -1,0 +1,231 @@
+{% extends 'app.html' %}
+{% load static %}
+
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/vue-dev.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/buefy/components/table/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/select/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/radio/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+
+<script>
+    window.onpageshow = function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    };
+
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                meio: "{{ form.meio.value|default_if_none:'' }}",
+                precisamTransporteEntreCampi: "{{ form.entrecampi.value|default_if_none:'False' }}" == "False" ?
+                    "" : "True",
+            }
+        },
+        computed: {
+            hora: function () {
+                let result = moment("{{ form.hora_chegada.value|default_if_none:'null' }}", "HH:mm:ss")
+                    .toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+        },
+        methods: {
+            moment: function () {
+                return moment();
+            },
+            local: function (meio) {
+                if (meio == 'outro') return "";
+                else if (meio == 'comboio') return "Estação de Comboios de Faro";
+                else if (meio == 'autocarro') return "Terminal Rodoviário de Faro";
+            },
+        },
+    });
+
+    $(function () {
+        $("form input").keypress(function (e) {
+            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                $('button[type=submit]').click();
+                return false;
+            } else {
+                return true;
+            }
+        });
+    });
+
+    function navigate_step(step) {
+        const form = $("form")
+        form.prepend('<input type="hidden" name="wizard_goto_step" value="' + step + '">');
+        $("form").submit();
+    }
+</script>
+{% endblock scripts %}
+
+{% block title %}- Inscrição{% endblock title %}
+
+{% block content %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}" class="router-link-active">Início</a></li>
+            <li class="is-active"><a href="" class="router-link-exact-active router-link-active">Criar
+                    Inscrição</a></li>
+        </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem;">
+        <div class="steps is-success">
+            <div class="step-item is-success is-completed" onclick="navigate_step('responsaveis')">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-account"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Responsável</p>
+                </div>
+            </div>
+            <div class="step-item is-success is-completed" onclick="navigate_step('escola')">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi {% if individual %}mdi-ballot{% else %}mdi-school{% endif %}"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">{% if individual %}Inscrição{% else %}Escola{% endif %}</p>
+                </div>
+            </div>
+            <div class="step-item is-success is-active">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-train-car"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Transporte</p>
+                </div>
+            </div>
+            <div class="step-item is-success {% if visited.3 %}is-completed {% endif %}"
+                {% if visited.3 %}onclick="navigate_step('transporte')" {% endif %}>
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-food-apple"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Almoço</p>
+                </div>
+            </div>
+            <div class="step-item is-success {% if visited.4 %}is-completed {% endif %}"
+                {% if visited.4 %}onclick="navigate_step('sessoes')" {% endif %}>
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-calendar-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Sessões</p>
+                </div>
+            </div>
+            <div class="step-item is-success">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Submissão</p>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ wizard.management_form }}
+            <div id="vue-app">
+                <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                    Informação de transporte <abbr
+                        title="Deve especificar o meio de transporte que vai utilizar para se deslocar até à universidade e a sua hora e local de chegada. Deve também selecionar se deseja transporte entre os campi."><span
+                            class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+                </h2>
+                <div class="columns">
+                    <div class="column is-4">
+                        <b-field label="Meio de transporte">
+                            <b-select v-model="meio" expanded name="transporte-meio" required>
+                                {% for value, meio in form.fields.meio.choices %}
+                                <option value="{{ value }}" {% if value|stringformat:'s' == form.meio.value %} selected
+                                    {% endif %}>
+                                    {{ meio }}
+                                </option>
+                                {% endfor %}
+                            </b-select>
+                            {{form.meio.errors}}
+                        </b-field>
+                    </div>
+                    <div class="column is-2">
+                        <b-field label="Hora de chegada">
+                            <b-timepicker v-model="hora" icon="clock" :increment-minutes="5" editable
+                                :disabled="meio=='outro'" name="transporte-hora_chegada">
+                            </b-timepicker>
+                        </b-field>
+                    </div>
+                    <div class="column">
+                        <b-field label="Local de chegada">
+                            <input class="input" name="transporte-local_chegada" :value="local(meio)"
+                                :disabled="meio=='outro'">
+                        </b-field>
+                    </div>
+                </div>
+                <p style="display: inline-block; padding-right: 2rem">
+                    Precisam de transporte para efectuar as visitas entre os Campi?
+                </p>
+                <b-radio v-model="precisamTransporteEntreCampi" name="transporte-entrecampi" native-value="">
+                    Não
+                </b-radio>
+                <b-radio v-model="precisamTransporteEntreCampi" name="transporte-entrecampi" native-value="True">
+                    Sim
+                </b-radio>
+                {% if form.non_field_errors %}
+                <div style="margin: 20px 20px; text-align: center;">
+                    <div class="message is-danger">
+                        <div class="message-body">
+                            {{ form.non_field_errors }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <hr />
+                <div class="column is-8 is-offset-2">
+                    <div class="level">
+                        <div class="level-left">
+                            {% if wizard.steps.prev %}
+                            <button class="button is-outlined" formnovalidate="formnovalidate" name="wizard_goto_step"
+                                value="{{ wizard.steps.prev }}">
+                                <span class=" icon is-small"><i class="mdi mdi-chevron-left"></i></span>
+                                <span>Anterior</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="level-right">
+                            <button type="submit" class="button is-success is-outlined">
+                                <span>Próximo</span>
+                                <span class="icon is-medium"><i class="mdi mdi-forward mdi-36px"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

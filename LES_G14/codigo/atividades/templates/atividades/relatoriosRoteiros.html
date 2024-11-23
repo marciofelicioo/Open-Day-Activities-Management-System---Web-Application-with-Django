@@ -1,0 +1,94 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load atividadestags %}
+<form method="POST" id='frm'>
+    {% csrf_token %}
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li><a href="{% url 'atividades:consultarRoteiros' %}">Roteiros</a></li>
+            <li class="is-active"><a href="" aria-current="page">Relatórios</a></li>
+        </ul>
+    </nav>
+    <br><br>
+    <div class="container is-centered">
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <div class="field">
+                    <label class="label">Ano</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="ano">
+                                <option value="">Selecione o ano</option>
+                                {% for ano in anos %}
+                                    <option value="{{ ano }}">{{ ano }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-narrow">
+                <div class="field">
+                    <label class="label">Dia</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="dia" id="id_dia">
+                                <option value="">Selecione o dia</option>
+                                <!-- Os dias serão carregados dinamicamente aqui -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="columns is-centered">
+            <div class="column">
+                <p class="has-text-centered">Em que formato deseja?</p> <!-- Texto centralizado acima dos botões -->
+            </div>
+        </div>
+        <div class="buttons is-centered" style="margin-top: 1rem;">
+            <button type="submit" formaction="{% url 'atividades:relatorioRoteirosPDF' %}" class="button is-danger is-outlined">
+                <span class="icon is-small">
+                    <i class="mdi mdi-file-pdf"></i>
+                </span>
+                <span>PDF</span>
+            </button>
+            <button type="submit" formaction="{% url 'atividades:relatorioRoteirosCSV' %}" class="button is-success is-outlined">
+                <span class="icon is-small">
+                    <i class="mdi mdi-file-excel"></i>
+                </span>
+                <span>CSV</span>
+            </button>
+        </div>
+    </div>
+</form>
+<style>
+  .label {
+  font-weight: normal;
+  }
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+{% endblock content %}
+{% block scripts %}
+
+<script>
+    $("select[name='ano']").change(function() {
+        var selectedYear = $(this).val();
+        $.ajax({
+            url: "{% url 'atividades:dias_disponiveis' %}",
+            method: 'POST',
+            data: {
+                'ano': selectedYear,
+                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function(data) {
+                $("#id_dia").html(data);
+            }
+        });
+    });
+</script>
+{% endblock scripts %}

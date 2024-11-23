@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição - Dia Aberto</title>
+</head>
+
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Criar Inscrição Individual</h2>
+        <hr>
+        <h4>Participante:</h4>
+        {{ participante_form.as_p }}
+        <hr>
+        <h4>Inscrição:</h4>
+        {{ inscricao_form.as_p }}
+        <button type="submit">Inscrever</button>
+    </form>
+</body>
+
+</html>

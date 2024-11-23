@@ -1,0 +1,190 @@
+{% extends 'app.html' %}
+
+{% block title %}- Consultar Inscrição{% endblock title %}
+
+{% block load %}
+{% block step_load %}
+{% endblock step_load %}
+{% endblock load %}
+{% load static %}
+{% load poll_extras %}
+{% load notificacoes_extras %}
+{% load inscricoes_extras %}
+{% load notifications_tags %}
+{% block scripts %}
+<script>
+    function voltar_marcacao_presencas() {
+        // Redireciona para a URL de marcação de presenças
+        window.location.href = "{% url 'inscricoes:consultar-inscricoes-admin' %}";
+    }
+    
+    window.onpageshow = function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    };
+
+    function navigate_step(step) {
+        location.href = "{% url 'inscricoes:consultar-inscricao' pk=pk step=12345 %}".replace(/12345/, step.toString());
+    }
+
+    function cancelar_alteracoes() {
+        location.href = "{% url 'inscricoes:consultar-inscricao' pk=pk step=step %}";
+    }
+
+    function alterar() {
+        location.href = "{% url 'inscricoes:alterar-inscricao' pk=pk step=step %}";
+    }
+
+    if ("{{alterar}}" != "True") {
+        $('input').attr('readonly', 'readonly');
+    }
+</script>
+{% block step_scripts %}
+{% endblock step_scripts %}
+{% endblock scripts %}
+
+{% block content %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a href="">Consultar
+                    Inscrição</a></li>
+        </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem;">
+        <div class="steps is-success">
+            <div class="step-item is-success{% if step == 0 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(0)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-account"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Responsável</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 1 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(1)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi {% if individual %}mdi-ballot{% else %}mdi-school{% endif %}"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">{% if individual %}Inscrição{% else %}Escola{% endif %}</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 2 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(2)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-train-car"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Transporte</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 3 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(3)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-food-apple"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Almoço</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 4 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(4)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-calendar-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Sessões</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 5 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(5)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Submissão</p>
+                </div>
+            </div>
+        </div>
+        <hr />
+        {% if alterar %}
+        <form method="post">
+            {% csrf_token %}
+            {% endif %}
+            {% block step_content %}
+            {% endblock step_content %}
+            {% if alterar %}
+            {% if form.non_field_errors %}
+            <div style="margin: 20px 20px; text-align: center;">
+                <div class="message is-danger">
+                    <div class="message-body">
+                        {{ form.non_field_errors }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            <hr />
+            <div class="column is-8 is-offset-2">
+                <div class="level">
+                    <div class="level-left">
+                        {% if alterar %}
+                        <button type="button" onclick="cancelar_alteracoes()" class="button is-outlined">
+                            <span>Cancelar</span>
+                        </button>
+                        {% else %}
+                        {% if step > 0 %}
+                        <button onclick="navigate_step({{step}} - 1)" class="button is-outlined">
+                            <span class=" icon is-small"><i class="mdi mdi-chevron-left"></i></span>
+                            <span>Anterior</span>
+                        </button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="level-right">
+                        {% if alterar %}
+                        <button type="submit" class="button is-success is-outlined">
+                            <span class="icon"><i class="mdi mdi-content-save"></i></span>
+                            <span>Guardar Alterações</span>
+                        </button>
+                        {% else %}
+                        {% if request.user|has_group:'Administrador' %}
+                        <button onclick="voltar_marcacao_presencas()" class="button is-primary" style="margin-right: 1rem">
+                            <span class="icon"><i class="mdi mdi-account-check mdi-24px"></i></span>
+                            <span>Voltar Registo de Presenças</span>
+                        </button>
+                        {% endif %}
+                        <button onclick="alterar()" class="button is-warning" style="margin-right: 1rem">
+                            <span class="icon"><i class="mdi mdi-pencil"></i></span>
+                            <span>Alterar</span>
+                        </button>
+                        <button onclick="navigate_step({{step}} + 1)" class="button is-success is-outlined">
+                            <span>Próximo</span>
+                            <span class="icon is-medium"><i class="mdi mdi-forward mdi-36px"></i></span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if alterar %}
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,40 @@
+{% extends 'bulma_table_details.html' %}
+{% block details_content %}
+
+<table class="table has-mobile-cards is-fullwidth" style="margin-bottom: 1rem;">
+    <tbody>
+        <tr>
+            <th class="th-wrap">Data da última alteração:</th>
+            <td style="font-weight: normal;">
+                <span>{{ row.record.updated_at }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th class="th-wrap">Dia Aberto:</th>
+            <td style="font-weight: normal;">
+                <span>{{ row.record.diaabertoid }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th class="th-wrap">Descrição:</th>
+            <td></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <td colspan="4">
+                <textarea class="textarea" disabled style="resize: none;">{{row.record.descricao}}</textarea>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<button type="button" class="button is-danger"
+    onclick="location.href='{% url 'atividades:roteiro-pdf' row.record.id %}';"><span class="icon is-small"><i
+            class="mdi mdi-download"></i></span> <span> Obter PDF </span>
+</button>
+
+<style>
+    .activity-details li {
+        margin-bottom: 3px; /* Ajuste a margem conforme necessário */
+    }
+</style>
+
+{% endblock details_content %}

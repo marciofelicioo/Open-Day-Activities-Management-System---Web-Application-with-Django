@@ -1,0 +1,19 @@
+<tr>
+    <input type="hidden" name="{{form_id}}" id="id_{{form_id}}">
+    <td data-label="Nome">
+        <input type="text" name="{{form_nome}}" class="input" maxlength="255" id="id_{{form_nome}}" required>
+    </td>
+     <td data-label="Sigla">
+        <input type="text" name="{{form_sigla}}" class="input" maxlength="16" id="id_{{form_sigla}}" required>
+    </td>
+    <td data-label="campus">
+        <div class="select">
+            <select name="{{form_campusid}}" class="input" id="id_{{form_campusid}}">
+                <option value="" selected="">---------</option>
+                <option value="1">Penha</option>
+                <option value="2">Gambelas</option>
+                <option value="3">Portimão</option>
+            </select>
+        </div>
+    </td>
+</tr>

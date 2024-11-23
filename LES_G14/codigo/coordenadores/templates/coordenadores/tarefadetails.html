@@ -1,0 +1,142 @@
+{% extends 'bulma_table_details.html' %}
+
+{% load coordenadores_extra %}
+{% block details_content %}
+
+<table class="table has-mobile-cards is-fullwidth" style="margin-bottom:1rem">
+    <tbody>
+        {% if  row.record.tipo == "tarefaAuxiliar" %}
+            <tr>
+                <th class="th-wrap">Atividade:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.tarefaauxiliar.sessao.atividadeid.nome}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Dia:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.dia}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Sessão:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.tarefaauxiliar.sessao.horarioid.inicio}} - {{row.record.tarefaauxiliar.sessao.horarioid.fim}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Local:</th>
+                <td style="font-weight: normal;">
+                    <span>Sala {{row.record.tarefaauxiliar.sessao.atividadeid.espacoid|safe}}, no Edifcio {{row.record.tarefaauxiliar.sessao.atividadeid.espacoid.edificio|safe}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Colaborador:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.colab|colab_none}}</span>
+                </td>
+            </tr>
+       {% endif %}
+       {% if row.record.tipo == "tarefaAcompanhar" %}
+            <tr>
+                <th class="th-wrap">Grupo:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.tarefaacompanhar.inscricao.id}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Dia:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.dia}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Horário:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.horario}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Local de encontro:</th>
+                <td>
+                    <span>{{row.record.tarefaacompanhar.origem|local|safe}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Local de destino:</th>
+                <td>
+                    <span>{{row.record.tarefaacompanhar.destino|local|safe}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Colaborador:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.colab|colab_none}}</span>
+                </td>
+            </tr>
+       {% endif %}
+       {% if row.record.tipo == "tarefaOutra" %}
+            <tr>
+                <th class="th-wrap">Dia:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.dia}}</span>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Horário:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.horario}}</span>
+                </td>
+            </tr>
+            <tr style="border-bottom: 1px solid #ddd">
+                <th class="th-wrap">Descrição:</th>
+                <td></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #ddd">
+                <td colspan="4" data-label="Descrição">
+                    <textarea class="textarea" disabled style="resize: none;">{{row.record.tarefaoutra.descricao}}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <th class="th-wrap">Colaborador:</th>
+                <td style="font-weight: normal;">
+                    <span>{{row.record.colab|colab_none}}</span>
+                </td>
+            </tr>
+       {% endif %}
+    </tbody>
+</table>
+{% if row.record.colab == None %}
+    <form method='POST' action="{% url 'coordenadores:atribuirColaborador' row.record.id %}">
+    {% csrf_token %}
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <div class="control is-expanded">
+                        <span class="select is-fullwidth is-empty">
+                            <select name="colab">
+                                {% if  row.record.tipo == "tarefaAuxiliar" %}
+                                    {% free_colabs row.record.coord row.record.dia row.record.horario row.record.tipo row.record.tarefaauxiliar.sessao.id %}
+                                {% else %}
+                                    {% free_colabs row.record.coord row.record.dia row.record.horario row.record.tipo %}
+                                {% endif %}
+                            </select>
+                        </span> 
+                    </div>
+                </div>
+            </div>  
+            <div class="column">
+                <button type="submit" class="button is-success is-outlined">
+                    <span class="icon is-small">
+                        <i class="mdi mdi-account-arrow-left"></i>
+                    </span> 
+                    <span>Atribuir Tarefa</span>
+                </button>
+            </div>
+        </div>
+    </form>
+{% endif %}
+
+{% endblock details_content %}
+
+

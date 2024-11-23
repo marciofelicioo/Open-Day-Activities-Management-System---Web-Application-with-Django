@@ -1,0 +1,115 @@
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Disponibilidade{% endblock title %}
+
+
+
+{% block content %}
+
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a href="{% url 'colaboradores:preferencia-atividade' %}">Disponibilidade</a></li>
+        </ul>
+    </nav>
+<div style="padding: 3rem 2vw 1rem">
+    <div class="steps is-success">
+
+        <div class="step-item is-completed is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                </span>
+
+            </div>
+
+            <div class="step-details">
+
+                <p class="step-title">Minha Disponibilidade</p>
+
+            </div>
+
+        </div>
+
+        <div class="step-item is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-flask mdi-24px"></i>
+
+                </span>
+
+            </div>
+
+
+
+            <div class="step-details">
+
+                <p class="step-title">Preferência de Atividade</p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="step-item is-success">
+
+            <div class="step-marker">
+
+                <span class="icon">
+
+                    <i class="mdi mdi-check"></i>
+
+                </span>
+
+            </div>
+
+            <div class="step-details">
+
+                <p class="step-title">Concluir</p>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+    <div style="margin-bottom:5%;margin-top:5%;">
+        <h2 class="title is-5" style="text-align: center;">Poderá escolher as atividades no qual pretende auxiliar
+            enviar</h2>
+    </div>
+    <div class="columns is-mobile is-centered">
+        <div class="column is-narrow">
+            <div class="buttons has-addons">
+
+                <a href="{% url 'colaboradores:escolher-atividades' %}">
+                    <button class="button">Escolher atividades</button>
+                </a>
+                <a href="{% url 'colaboradores:atividades-escolhidas' %}">
+                    <button class="button">Ver atividades escolhidas</button>
+                </a>
+                <a href="{% url 'colaboradores:concluir-disponibilidade' %}">
+                    <button class="button">Confirmar disponibilidade</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{% url 'colaboradores:minha-disponibilidade' %}">
+    <button type="button" value="Voltar" class="button is-outlined"
+        style="margin-left: 10%;margin-top:10%;">Voltar</button>
+</a>
+</div>
+{% endblock content %}

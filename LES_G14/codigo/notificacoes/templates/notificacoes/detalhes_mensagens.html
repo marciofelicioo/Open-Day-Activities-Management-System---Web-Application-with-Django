@@ -1,0 +1,381 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+{% extends 'app.html' %}
+
+{% block title %}- Mensagens{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/notificacoes.css' %}">
+{% endblock load %}
+{% load poll_extras %}
+{% load notificacoes_extras %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a>Mensagens</a></li>
+        </ul>
+    </nav>
+    <div class="columns" id="mail-app">
+        <aside class="column is-2 aside hero is-fullheight">
+            <div>
+                <div class="compose has-text-centered">
+                    <a href="{% url 'notificacoes:enviar-notificacao' %}" class="button is-danger is-block is-bold">
+                        <span class="compose">Nova Mensagem</span>
+                    </a>
+                </div>
+                <div class="main">
+                    {% if categoria == 0 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 0 0 %}" class="item active"><span
+                            class="name">Recebidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 0 0 %}" class="item"><span
+                            class="name">Recebidas</span></a>
+                    {% endif %}
+                    {% if categoria == 5 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 5 0 %}" class="item active"><span
+                            class="name">Enviadas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 5 0 %}" class="item"><span
+                            class="name">Enviadas</span></a>
+                    {% endif %}
+                    {% if categoria == 1 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 1 0 %}" class="item active"><span class="name">Não
+                            Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 1 0 %}" class="item"><span class="name">Não
+                            Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 2 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 2 0 %}" class="item active"><span
+                            class="name">Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 2 0 %}" class="item"><span
+                            class="name">Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 3 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 3 0 %}" class="item active"><span
+                            class="name">Individuais</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 3 0 %}" class="item"><span
+                            class="name">Individuais</span></a>
+                    {% endif %}
+                    {% if categoria == 4 %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 4 0 %}" class="item active"><span
+                            class="name">Grupos</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 4 0 %}" class="item"><span
+                            class="name">Grupos</span></a>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+        <div class="column is-4 messages hero is-fullheight">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    {% if categoria != 5 %}
+                    <a href="{% url 'notificacoes:ler-mensagens' categoria %}" class="button is-small">
+                        <div data-tooltip="Marcar mensagens como lidas"><i
+                                class="mdi mdi-email-mark-as-unread mdi-18px"></i></div>
+                    </a>
+                    {% else %}
+                    <a href="#" class="button is-small">
+                        <div data-tooltip="Marcar mensagens como lidas"><i
+                                class="mdi mdi-email-mark-as-unread mdi-18px"></i></div>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'notificacoes:detalhes-mensagem' categoria atual.mensagem.id %}?page={{notificacoes.number}}" class="button is-small">
+                        <i class="mdi mdi-reload mdi-18px"></i>
+                    </a>
+                </div>
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 0 0 %}" class="button is-small"><i
+                            class="fa fa-inbox"></i></a>
+                    <a class="button is-small">
+                        <div data-tooltip="Click em Nova Mensagem para comunicar diretamente com um utilizador"><i
+                                class="fa fa-question-circle"></i></div>
+                    </a>
+                    <a onclick="alert.render('Tem a certeza que pretende eliminar todas as mensagens desta categoria?','{% url 'notificacoes:limpar-mensagens' categoria %}')"
+                        class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+
+
+                <div class="control is-grouped pg">
+                    <div class="title">{{ notificacoes.start_index }}-{{ notificacoes.end_index }} de
+                        {{ total }}
+                    </div>
+                    {% if notificacoes.has_previous %}
+                    <a class="button is-link" href="?page={{notificacoes.previous_page_number}}"><i
+                            class="fa fa-chevron-left"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-left"></i></a>
+                    {% endif %}
+                    {% if notificacoes.has_next %}
+                    <a class="button is-link" href="?page={{notificacoes.next_page_number}}"><i
+                            class="fa fa-chevron-right"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="inbox-messages" id="inbox-messages">
+
+
+
+
+                {% for notificacao in notificacoes %}
+
+                <a
+                    href="{% url 'notificacoes:detalhes-mensagem' categoria notificacao.mensagem.id %}?page={{notificacoes.number}}">
+                    <div data-tooltip="Click para ver detalhes">
+                        <div class="box message-preview" style="margin-top:0%;margin-bottom:0%">
+                            {% if notificacao.mensagem.lido == True or categoria == 5 %}
+                            <div class="top">
+                                {% else %}
+                                <div class="top" style="background: WhiteSmoke;">
+                                    {% endif %}
+                                    <div class="avatar">
+                                        <img src="{% static 'img/user.png' %}" alt="Dia Aberto">
+                                    </div>
+                                    {% if categoria != 5 %}
+                                    <div class="address">
+                                        <div class="name">{{notificacao.mensagem.emissor.first_name}}
+                                            {{notificacao.mensagem.emissor.last_name}}
+                                            <small>({{notificacao.mensagem.emissor.getProfile}})</small>
+                                        </div>
+                                        <div class="email">{{notificacao.mensagem.emissor.email}}</div>
+                                        <div class="field-body">
+                                            <p class="control">
+                                                {{notificacao.mensagem.titulo}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="address">
+                                        {% if notificacao.mensagem.tipo != "Individual" %}
+                                        <div class="name"> {{notificacao.mensagem.tipo}}</div>
+                                        <div class="field-body">
+                                            <p class="control">
+                                                {{notificacao.mensagem.titulo}}
+                                            </p>
+                                        </div>
+                                        {% else %}
+
+                                        <div class="name">{{notificacao.mensagem.recetor.first_name}}
+                                            {{notificacao.mensagem.recetor.last_name}}
+                                            <small>({{notificacao.mensagem.recetor.getProfile}})</small>
+                                        </div>
+                                        <div class="email">{{notificacao.mensagem.recetor.email}}</div>
+                                        <div class="field-body">
+                                            <p class="control">
+                                                {{notificacao.mensagem.titulo}}
+                                            </p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                </a>
+                {%endfor%}
+
+
+
+
+
+            </div>
+        </div>
+
+        <div class="column is-6 message hero is-fullheight is-active" id="message-pane">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:detalhes-mensagem' 0 0 %}" class="button is-small"><i
+                            class="fa fa-inbox"></i></a>
+                    <a class="button is-small">
+                        <div data-tooltip="Escreva uma resposta a {{atual.mensagem.emissor.first_name}}"><i
+                                class="fa fa-question-circle"></i></div>
+                    </a>
+                    <a onclick="alert.render('Tem a certeza que pretende eliminar esta mensagem?','{% url 'notificacoes:apagar-mensagem' categoria atual.mensagem.id %}?page={{notificacoes.number}}')"
+                        class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="box message-preview">
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="image is-64x64">
+                            <img src="{% static 'img/user.png' %}" alt="Dia Aberto">
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <div class="top">
+                                    <div class="address">
+                                        <div class="name">{{atual.mensagem.emissor.first_name}}
+                                            {{atual.mensagem.emissor.last_name}}
+                                            <small>({{atual.mensagem.emissor.getProfile}})</small>
+                                        </div>
+                                        <div class="email">{{atual.mensagem.emissor.email}}</div>
+                                    </div>
+                                </div>
+                                <br>
+                                {% if categoria == 5 %}
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Destinatário</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field has-addons has-background-light">
+                                            {% if atual.mensagem.tipo != "Individual" %}
+                                            <div class="field-body">
+                                                <div class="field has-addons has-background-light">
+                                                    <p class="control has-background-light" style="padding: 10px 30px">
+                                                        <strong>{{atual.mensagem.tipo}}</strong>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div class="top">
+                                                <div class="address">
+                                                    <div class="name">{{atual.mensagem.recetor.first_name}}
+                                                        {{atual.mensagem.recetor.last_name}}
+                                                        <small>({{atual.mensagem.recetor.getProfile}})</small>
+                                                    </div>
+                                                    <div class="email">{{atual.mensagem.recetor.email}}</div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Título</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field has-addons has-background-light">
+                                            <p class="control has-background-light" style="padding: 10px 30px">
+                                                {{atual.mensagem.titulo}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Mensagem</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field has-addons has-background-light">
+                                            <p class="control" style="padding: 10px 30px">
+                                                {{atual.mensagem.descricao}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <small>{{atual.mensagem.data}}</small>
+                            </p>
+                        </div>
+
+                        {% comment %} {% for resposta in respostas %}
+                        <article class="media">
+                            <figure class="media-left">
+                                <p class="image is-48x48">
+                                    <img src="{% static 'img/user.png' %}" alt="Dia Aberto">
+                                </p>
+                            </figure>
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <strong>{{resposta.mensagem.emissor.first_name}}
+                                            {{resposta.mensagem.emissor.last_name}}</strong>
+                                        <br>
+                                        {{resposta.mensagem.descricao}}
+                                        <br>
+                                        <small>{{resposta.mensagem.data}}</small>
+                                    </p>
+                                </div>
+
+                            </div>
+                        </article>
+                        {% endfor %} {% endcomment %}
+
+                        {% comment %} <h1>{{atual.id}}</h1> {% endcomment %}
+                    </div>
+                </article>
+                {% if categoria != 5 %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="msg_atual" value="{{ atual.id }}" />
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-64x64">
+                                <img src="{% static 'img/user.png' %}" alt="Dia Aberto">
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="field">
+                                <p class="control">
+                                    <textarea class="textarea" name="mensagem"
+                                        placeholder="Escreva uma resposta">{{form.mensagem.value|default_if_none:"" }}</textarea>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <button class="button">Responder</button>
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                </form>
+                {% if msg %}
+                <div style="margin-top:5%;text-align:center;position:center;">
+                    {% if  m != "" %}
+                    <article class="message is-success">
+
+                        <p style="text-align: center;">
+                            <strong>{{m}}</strong>
+                        </p>
+
+                    </article>
+                    {% else %}
+                    <article class="message is-danger">
+                        <p style="text-align: center;">
+                            {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                            {{error}}
+                            {% endfor %}
+                            {% else %}
+                            {% for field in form %}
+                            {% for error in field.errors %}
+                            {{ error }}
+                            {% endfor %}
+                            {% endfor %}
+                            {%endif%}
+                        </p>
+
+                    </article>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

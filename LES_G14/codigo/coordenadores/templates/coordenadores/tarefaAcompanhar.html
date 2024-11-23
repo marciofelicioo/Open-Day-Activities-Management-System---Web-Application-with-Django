@@ -1,0 +1,87 @@
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Grupo</label>
+            <div class="control">
+                <div class="columns">
+                    <div class="column is-full">
+                        <div class="select is-fullwidth">
+                            {{form.grupo}}                        
+                        </div>
+                    </div>
+                    <div class="column" style="padding-top: 17px;">
+                        <div class="dropdown is-hoverable is-centered">
+                            <div class="dropdown-trigger">
+                                <span class="icon  has-text-info">
+                                    <i class="mdi mdi-information-outline mdi-24px"></i>
+                                </span>
+                            </div>
+                            <div class="dropdown-menu"  role="menu">
+                                <div class="dropdown-content">
+                                  <div class="dropdown-item" id="grupoinfo">
+                                    <p>Selecione um grupo para ver a informação sobre o mesmo.</p>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>                  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>      
+</div>
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Dia</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="dia" onchange="grupoHorario()" id="id_dia">
+                        <option value="">Escolha o dia</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Horário</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="horario" onchange="grupoOrigem()" id="id_horario">
+                        <option value="">Escolha o horário</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>             
+</div>
+<div>
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Local de encontro</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="origem" onchange="grupoDestino()" id="id_origem">
+                        <option value="">Escolha o local de encontro</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+<div class="columns">
+    <div class="column"> 
+        <div class="field">
+            <label class="label">Local de destino</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="destino" onchange="colaboradoresSelect()" id="id_destino">
+                        <option value="">Escolha o local de destino</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

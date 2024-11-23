@@ -1,0 +1,110 @@
+{% extends 'inscricoes/consultar_inscricao_template.html' %}
+{% load static %}
+
+{% block step_load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{% endblock step_load %}
+
+{% block step_scripts %}
+<script src="{% static 'js/vue-dev.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/buefy/components/table/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/select/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/radio/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+
+<script>
+    new Vue({
+        el: '#vue-app',
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+                meio: "{{ form.meio.value|default_if_none:'' }}",
+                precisamTransporteEntreCampi: "{{ form.entrecampi.value|default_if_none:'False' }}" == "False" ?
+                    "" : "True",
+            }
+        },
+        computed: {
+            hora: function () {
+                let result = moment("{{ form.hora_chegada.value|default_if_none:'null' }}", "HH:mm:ss")
+                    .toDate()
+                if (isNaN(result)) return null;
+                return result;
+            },
+        },
+        methods: {
+            moment: function () {
+                return moment();
+            },
+            local: function (meio) {
+                if (meio == 'outro') return "";
+                else if (meio == 'comboio') return "Estação de Comboios de Faro";
+                else if (meio == 'autocarro') return "Terminal Rodoviário de Faro";
+            },
+        },
+    });
+</script>
+{% endblock step_scripts %}
+
+{% block step_content %}
+<div id="vue-app">
+    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+        Informação de transporte <abbr
+            title="Deve especificar o meio de transporte que vai utilizar para se deslocar até à universidade e a sua hora e local de chegada. Deve também selecionar se deseja transporte entre os campi."><span
+                class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+    </h2>
+    <div class="columns">
+        <div class="column is-4">
+            <b-field label="Meio de transporte">
+                {% if alterar %}
+                <b-select v-model="meio" expanded name="{{form.meio.name}}" required>
+                    {% for value, meio in form.fields.meio.choices %}
+                    <option value="{{ value }}" {% if value|stringformat:'s' == form.meio.value %} selected {% endif %}>
+                        {{ meio }}
+                    </option>
+                    {% endfor %}
+                </b-select>
+                {{form.meio.errors}}
+                {% else %}
+                <input type="text" class="input" readonly
+                    value="{% for value, meio in form.fields.meio.choices %}{% if value|stringformat:'s' == form.meio.value %}{{ meio }}{% endif %}{% endfor %}">
+                {% endif %}
+            </b-field>
+        </div>
+        <div class="column is-2">
+            <b-field label="Hora de chegada">
+                {% if alterar or form.meio.value == 'outro' %}
+                <b-timepicker v-model="hora" icon="clock" :increment-minutes="5" editable :disabled="meio=='outro'"
+                    name="{{form.hora_chegada.name}}">
+                </b-timepicker>
+                {% else %}
+                <input type="text" class="input" readonly value="{{form.hora_chegada.value|default_if_none:''}}">
+                {% endif %}
+            </b-field>
+        </div>
+        <div class="column">
+            <b-field label="Local de chegada">
+                {% if alterar or form.meio.value == 'outro' %}
+                <input class="input" name="{{form.local_chegada.name}}" :value="local(meio)" :disabled="meio=='outro'">
+                {% else %}
+                <input type="text" class="input" readonly value="{{form.local_chegada.value|default_if_none:''}}">
+                {% endif %}
+            </b-field>
+        </div>
+    </div>
+    <p style="display: inline-block; padding-right: 2rem">
+        Precisam de transporte para efectuar as visitas entre os Campi?
+    </p>
+    {% if not alterar %}<strong>{% if form.entrecampi.value %}Sim{% else %}Não{% endif %}</strong>{% endif %}
+    {% if alterar %}
+    <b-radio v-model="precisamTransporteEntreCampi" name="{{form.entrecampi.name}}" native-value="">
+        Não
+    </b-radio>
+    <b-radio v-model="precisamTransporteEntreCampi" name="{{form.entrecampi.name}}" native-value="True">
+        Sim
+    </b-radio>
+    {% endif %}
+</div>
+{% endblock step_content %}

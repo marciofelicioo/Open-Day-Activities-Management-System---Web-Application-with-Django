@@ -1,0 +1,124 @@
+{% extends 'app.html' %}
+{% load django_tables2 %}
+{% block content %}
+<div class="columns">
+    <div class="column is-3">
+    <form method="get">
+        <div class="menu">
+            <p class="menu-label">Filtros Roteiros</p>
+            <ul class="menu-list">
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                            <select name="{{ filter.form.ano.html_name }}">
+                                <option value="" {% if not filter.form.ano.value %}selected{% endif %}>Ano</option>
+                                {% for value, label in filter.form.ano.field.choices %}
+                                    <option value="{{ value }}" {% if value == filter.form.ano.value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <span class="icon is-left">
+                            <i class="mdi mdi-magnify mdi-24px"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="field">
+                    <!---->
+                    <div class="control has-icons-left is-clearfix">
+                        <input class='input' id='id_nome' type='text' name='nome' value="{{filter.form.nome.value|default_if_none:''}}" placeholder="Nome">
+                        <span class="icon is-left">
+                            <i class="mdi mdi-magnify mdi-24px"></i>
+                        </span>
+                    </div>
+                    <!---->
+                </div>
+            </ul>   
+            <div class='field is-grouped' style='margin-top: 5px'>
+                    <p class="control is-expanded">
+                        <a class="button is-light is-fullwidth" role="button" type="button" href="{% url 'atividades:consultarRoteiros' %}">Limpar</a>
+                    </p>
+                    <p class="control is-expanded">
+                        <button class="button is-primary is-fullwidth" type="submit">
+                            <span class="icon">
+                                <i class="mdi mdi-magnify"></i>
+                            </span>
+                            <span>Pesquisar</span>
+                        </button>
+                    </p>
+            </div>
+        </div>     
+    </form>      
+    </div>
+    <div class="column">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="#">Início</a></li>
+                <li class="is-active"><a href="#" aria-current="page">Roteiros</a></li>
+            </ul>
+        </nav>
+
+        {% if is_open == True %}
+            <a href="{% url 'atividades:criarRoteiro' %}" class="button is-success is-outlined" type="button" style="margin-bottom: 0.5rem">
+        {% else %}
+            <a onclick="alert.warning('Não pode adicionar roteiros pois não existe nenhum Dia Aberto atual.');" class="button is-success is-outlined" type="button" style="margin-bottom: 0.5rem">
+        {% endif %}
+                <span class="icon is-small">
+                    <i class="mdi mdi-plus"></i>
+                </span>
+                <span>Adicionar Roteiro</span>
+            </a>
+        {% render_table table 'atividades/roteirodetails.html' %}
+    </div>
+</div>    
+
+<style>
+    .modal {
+    display: none; /* Inicialmente oculto */
+    position: fixed; /* Permanece fixo na janela de visualização */
+    z-index: 1; /* Posicione o modal acima de outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+    overflow: auto; /* Adicione rolagem se necessário */
+    background-color: rgb(0,0,0); /* Fallback de cor de fundo */
+    background-color: rgba(0,0,0,0.4); /* Cor de fundo com transparência */
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Centralize verticalmente e 15% do topo */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 25%; /* Largura do modal */
+}
+
+/* Fechar botão */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+
+
+{% endblock content %}
+
+{% block title %}
+    - Consultar Roteiros
+{% endblock %}
+
+{% block scripts %}
+<script>
+    
+</script>
+{% endblock scripts %}

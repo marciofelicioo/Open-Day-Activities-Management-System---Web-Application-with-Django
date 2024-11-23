@@ -1,0 +1,366 @@
+
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Alterar Perfil{% endblock title %}
+
+
+{% block content %}
+
+<div>
+
+
+
+               {% if registo == 1 or registo == 5 %}
+               <form method="post">
+                {% csrf_token %}
+                {% elif registo == 2  %}      
+                <form method="post" id="ProfessorUniversitarioRegisterForm" data-departamentos-url="{% url 'utilizadores:ajax_load_departamentos' %}" novalidate>
+                {% csrf_token %}
+                {% elif registo == 3  %}      
+                <form method="post" id="CoordenadorRegisterForm" data-departamentos-url="{% url 'utilizadores:ajax_load_departamentos' %}" novalidate>
+                {% csrf_token %}
+                {% elif registo == 4  %}      
+                <form method="post" id="ColaboradorRegisterForm" data-departamentos-url="{% url 'utilizadores:ajax_load_departamentos' %}"  data-cursos-url="{% url 'utilizadores:ajax_load_cursos' %}" novalidate>
+                {% csrf_token %}
+                {% endif %}
+                
+                    <div style="padding: 1rem 2vw 0px;">
+                    <hr>
+                    <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem;">
+                    {{perfil}} 
+                    </h2>
+                    <div class="columns">
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Nome Próprio</label>
+                    <div class="control is-clearfix">
+                    <input name="first_name" class="input" id="id_first_name" value="{{form.first_name.value|default_if_none:user.first_name }}" style="" type="text" maxlength="255">
+                    <!----> <!----> <!---->
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Apelido</label>
+                    <div class="control is-clearfix">
+   
+
+                    <input name="last_name"class="input" id="id_last_name" style="" value="{{form.last_name.value|default_if_none:user.last_name }}" type="text" maxlength="255">
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    
+                    <hr>
+                    </div>
+
+
+                    <div class="columns">
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Username</label>
+                    <div class="control is-clearfix">
+                    <input  name="username" value="{{username}}" class="input"id="id_username" style="" type="text" maxlength="255"> 
+
+
+
+                    <!----> <!----> <!---->
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control is-clearfix">
+                    <input class="input" name="email"id="id_email"value="{{form.email.value|default_if_none:user.email}}" type="text" style="" maxlength="255"> <!----> <!----> <!---->
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Contacto</label>
+                    <div class="control is-clearfix">
+
+                    <input name="contacto" class="input" id="id_contacto"  value="{{form.contacto.value |default_if_none:user.contacto }}"  style="" type="text" maxlength="255">
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <hr>
+                    </div>
+
+                    <div class="columns">
+                    
+                    <hr>
+                    </div>
+
+            {% if registo == 2 or registo == 3 %}
+
+                    <div class="columns">
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Faculdade</label>
+                    <div class="control is-clearfix">
+
+                            <div class="field">
+                                <!---->
+                                <div class="control is-expanded">
+                                    <span class="select is-fullwidth is-empty">
+                                        {{form.faculdade}}
+                                    </span>
+                                    <!---->
+                                </div>
+                                <!---->
+                            </div>
+
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Departamento</label>
+                    <div class="control is-clearfix">
+                    
+                            <div class="field">
+                                <!---->
+                                <div class="control is-expanded">
+                                    <span class="select is-fullwidth is-empty">
+                                        {{form.departamento}}
+                                    </span>
+                                    <!---->
+                                </div>
+                                <!---->
+                            </div>
+
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Gabinete</label>
+                    <div class="control is-clearfix">
+                    <input class="input" name="gabinete"id="id_gabinete"  value="{{form.gabinete.value|default_if_none:gabinete}}" type="text" style="" maxlength="255">
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <hr>
+                    </div>
+            {% elif registo == 4%}
+
+
+                    <div class="columns">
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Faculdade</label>
+                    <div class="control is-clearfix">
+
+                            <div class="field">
+                                <!---->
+                                <div class="control is-expanded">
+                                    <span class="select is-fullwidth is-empty">
+                                        {{form.faculdade}}
+                                    </span>
+                                    <!---->
+                                </div>
+                                <!---->
+                            </div>
+
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Departamento</label>
+                    <div class="control is-clearfix">
+                    
+                            <div class="field">
+                                <!---->
+                                <div class="control is-expanded">
+                                    <span class="select is-fullwidth is-empty">
+                                        {{form.departamento}}
+                                    </span>
+                                    <!---->
+                                </div>
+                                <!---->
+                            </div>
+
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <div class="column">
+                    <div class="field">
+                    <label class="label">Curso</label>
+                    <div class="control is-clearfix">
+                    
+                            <div class="field">
+                                <!---->
+                                <div class="control is-expanded">
+                                    <span class="select is-fullwidth is-empty">
+                                        {{form.curso}}
+                                    </span>
+                                    <!---->
+                                </div>
+                                <!---->
+                            </div>
+
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <hr>
+                    </div>
+                {% elif registo == 5%}
+
+                    <div class="columns" style="margin-right:66.6%;">
+                    <div class="column">
+                    <div class="field">
+                    
+                    <label class="label">Gabinete</label>
+                    <div class="control is-clearfix">
+                    <input class="input" name="gabinete"id="id_gabinete" value="{{form.gabinete.value|default_if_none:gabinete }}" type="text" style="" maxlength="255">
+                    </div>
+                    <!---->
+                    </div>
+                    </div>
+                    <hr>
+                    </div>
+                {% endif %}
+                    <div style="margin-top:2%;text-align:center;position:center;">
+                    <button type="button" value="Voltar" class="button is-outlined" style="margin-right:5%" onclick="voltar();">Voltar</button>
+                    <button style="" type="submit" class="button is-success is-outlined">
+                        <span>Confirmar</span>
+                    </button>
+                   </div>
+                   </form>
+    </div>
+</div>
+
+
+    
+            {% if msg %}
+                  <div  style="margin-left:30%;margin-right:30%; margin-top:%">
+                    <div style="margin-top:2%;text-align: center;position:center;">
+                    <article class="message is-danger">
+                        <div class="message-body">
+                        <p style="text-align: center;">
+                            {% if form.non_field_errors %}
+                  {% for error in form.non_field_errors %}
+                  <p style="color: #ff0000; text-align:center">{{error}}</p>
+                  {% endfor %}
+                  {% endif %}
+                  {% for error in erros %}
+                  <p style="color: #ff0000; text-align:center">{{error}}</p>
+                  {% endfor %}
+
+                
+                  {% for field in form %}
+                  {% for error in field.errors %}
+                  {% if field.name == "email" %}
+                  <p style="color: #ff0000;">{{ error }}</p>
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+
+                        </p>
+                        </div>
+                    </article>  
+                    </div>
+                </div>
+            {% endif %} 
+        
+
+    {% endblock content %}
+
+</div>
+
+
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+function voltar() {
+  location.href="/utilizadores/mudarmeuperfilescolha"
+}
+
+
+    {% if registo == 2 %}
+    $("#id_faculdade").change(function () {
+      var url = $("#ProfessorUniversitarioRegisterForm").attr("data-departamentos-url");
+      var faculdadeid = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'faculdade': faculdadeid
+        },
+        success: function (data) {
+          $("#id_departamento").html(data);
+        }
+      });
+
+    });
+    {% elif registo == 3 %}
+    $("#id_faculdade").change(function () {
+      var url = $("#CoordenadorRegisterForm").attr("data-departamentos-url");
+      var faculdadeid = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'faculdade': faculdadeid
+        },
+        success: function (data) {
+          $("#id_departamento").html(data);
+        }
+      });
+
+    });
+    {% elif registo == 4 %}
+        $("#id_faculdade").change(function () {
+
+      var url= $("#ColaboradorRegisterForm").attr("data-cursos-url");
+      var faculdadeid = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'faculdade': faculdadeid
+        },
+        success: function (data) {
+          $("#id_curso").html(data);
+          
+        }
+      });
+
+    });
+        $("#id_faculdade").change(function () {
+
+      var url= $("#ColaboradorRegisterForm").attr("data-departamentos-url");
+      var faculdadeid = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'faculdade': faculdadeid
+        },
+        success: function (data) {
+          $("#id_departamento").html(data);
+          
+        }
+      });
+
+    });
+    {% endif %}
+</script>
+{% endblock scripts %}

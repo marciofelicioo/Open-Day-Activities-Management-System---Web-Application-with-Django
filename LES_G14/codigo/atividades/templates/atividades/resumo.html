@@ -1,0 +1,248 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load atividadestags %}
+<form method="POST" action="" id='frm'>
+<div id="id_removed_rows" style="display:none;"></div>
+<div id="proporatividade" style="display: content">
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li><a href="{% url 'atividades:minhasAtividades' %}">Minhas Atividades</a></li>
+    <li class="is-active"><a href="" aria-current="page">Resumo</a></li>
+  </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+         <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-flask mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Criar Atividade</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-calendar-check mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Adicionar Sessoes</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+            <section class="step-content">
+                <div class="step-item">
+                    <div style="padding: 1rem 2vw 0px">
+                        <hr>
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                        Informação de atividade
+                        </h2>
+                        <div class="columns">
+                        <div class="column">
+                        
+                            <span>
+                            <h3><b>Nome da Atividade:&nbsp;&nbsp;</b>{{atividade.nome}}</h3>
+                            </span>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                            <h3><b>Tipo de Atividade:&nbsp;&nbsp;</b>{{atividade.tipo}}</h3>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                            <h3><b>Local:&nbsp;&nbsp;</b>{{atividade.espacoid.edificio.campus.nome}}, {{atividade.espacoid.edificio.nome}} {{atividade.espacoid.nome}}</h3>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                            <h3><b>Descrição:</b></h3>
+                            <div class="control">
+                                <textarea class="textarea" disabled>{{atividade.descricao}}</textarea>
+                                
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <br>
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <h3><b>Publico Alvo:&nbsp;&nbsp;</b>{{atividade.publicoalvo}}</h3>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <h3><b>Tema:&nbsp;&nbsp;</b>{{atividade.tema.tema}}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                            Requisitos de Atividade
+                        </h2>
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <h3><b>Colaboradores Necessarios:&nbsp;&nbsp;</b>{{atividade.nrcolaboradoresnecessario}}</h3>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <h3><b>Maximo de Participantes:&nbsp;&nbsp;</b>{{atividade.participantesmaximo}}</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="column">
+                                <div class="field">
+                                    <h3><b>Materiais Extra Necessarios:&nbsp;&nbsp;</b>{% if material.nomematerial is not None %}{{material.nomematerial}}{% else %}Nenhum{% endif %}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Minhas Sessoes</h2>
+
+            <div class="table ">
+                            <div class="table-wrapper">
+                                <table class="table has-mobile-cards is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                     Dia
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                     Horário
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th style=""></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>    
+                                        {% for sessao in sessions_activity %} 
+                                        <tr id="sessao.id" draggable="false">
+                                            <td data-label="Dia">{{sessao.dia}}</td>
+                                            <td data-label="Nome">{{sessao.horarioid.inicio}} - {{sessao.horarioid.fim}}</td>
+                                        </tr>
+                                        {% endfor %} 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr/>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="column is-8 is-offset-2">
+          <div class="level">
+            <div class="level-left">
+              <button  class="button is-medium is-outlined" name="anterior" value="anterior">
+                <span class="icon is-medium">
+                    <i class="mdi fa fa-arrow-left mdi-36px"></i>
+                </span>
+                <span>Anterior</span>
+            </button>
+            </div>
+           
+        <div class="level-right">
+        {% if nsub == 1 %}
+          <a id="concluir" onclick= "alert.render('Deseja finalizar esta proposta?','{% url 'atividades:confirmarResumo' atividade.id %}')" class="button is-medium is-success is-outlined is-link">
+         
+            <span>Submeter Proposta</span>
+            <span class="icon is-medium">
+                  <i class="mdi mdi-check mdi-36px"></i>
+                </span>
+          </a>
+          {% else %}
+          <a id="concluir" href= "{% url 'atividades:confirmarResumo' atividade.id %}" class="button is-medium is-success is-outlined is-link">
+            <span>Alterar Atividade</span>
+            <span class="icon is-medium">
+                  <i class="mdi mdi-check mdi-36px"></i>
+                </span>
+          </a>
+          {% endif %}
+        </div>
+          </div>
+        </div>
+  </div>
+</div>
+{% csrf_token %}
+</form>
+<style>
+  .label {
+  font-weight: normal;
+  }
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+{% endblock content %}
+{% block scripts %}
+
+<script>
+    
+    
+</script>
+{% endblock scripts %}

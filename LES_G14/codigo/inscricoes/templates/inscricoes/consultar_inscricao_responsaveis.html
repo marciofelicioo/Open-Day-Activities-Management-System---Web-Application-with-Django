@@ -1,0 +1,38 @@
+{% extends 'inscricoes/consultar_inscricao_template.html' %}
+
+{% block step_content %}
+<h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+    {% if individual %}Dados do Participante Responsável{% else %}Docente Responsável{% endif %}
+    <abbr title="Deve fornecer os dados necessários para o contacto do participante ou do responsável"><span
+            class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+</h2>
+<div class="columns">
+    <div class="column">
+        <div class="field">
+            <label class="label">Nome</label>
+            <div class="controlis-clearfix">
+                <input type="text" class="input" name="{{form.nome.name}}" value="{{form.nome.value}}" required>
+            </div>
+            {{ form.nome.errors }}
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label">E-mail</label>
+            <div class="control is-clearfix">
+                <input type="email" class="input" name="{{form.email.name}}" value="{{form.email.value}}" required>
+            </div>
+            {{ form.email.errors }}
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label">Telemóvel/Telefone</label>
+            <div class="control is-clearfix">
+                <input type="tel" class="input" name="{{form.tel.name}}" value="{{form.tel.value}}" required>
+            </div>
+            {{ form.tel.errors }}
+        </div>
+    </div>
+</div>
+{% endblock step_content %}

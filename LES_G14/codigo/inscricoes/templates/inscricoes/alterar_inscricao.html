@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Inscrição</title>
+</head>
+
+<body>
+    {% comment %} <form method="post">
+        {% csrf_token %}
+        <h2>Alterar Inscrição</h2>
+        <hr>
+
+        {% for inscricao in inscricoes %}
+        <table>
+            <tr>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricao.local}}</a></td>
+            </tr>
+        </table>
+        {% endfor %}
+
+        {% for escola in inscricoes %}
+        <table>
+            <tr>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ escola.nome}}</a></td>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ escola.local}}</a></td>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ escola.telefone}}</a></td>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ escola.email}}</a>
+            </tr>
+        </table>
+        {% endfor %}
+
+        {% for inscricaocoletiva in inscricoes %}
+        <table>
+            <tr>
+                <h4>Num Alunos:</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaocoletiva.nalunos}}</a></td>
+                <h4>Num responsaveis:</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaocoletiva.nresponsaveis}}</a></td>
+
+            </tr>
+        </table>
+        {% endfor %}
+
+        {% for inscricaoindividual in inscricoes %}
+        <table>
+            <tr>
+                <h4>Num acompanhantes:</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaoindividual.nacompanhantes}}</a></td>
+
+            </tr>
+        </table>
+        {% endfor %}
+
+        {% for inscricaoprato in inscricoes %}
+        <table>
+            <tr>
+                <h4>Prato</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaoprato.prato}}</a></td>
+                <h4>Num pessoas</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaoprato.npessoas}}</a></td>
+            </tr>
+        </table>
+        {% endfor %}
+
+    
+        <table class="table">
+            <tr>
+                <th>Nome da Atividade</th>
+                <th>Nº Sessões</th>
+            </tr>
+            {% for atividade in atividades %}
+            <tr>
+                <td>{{atividade.nome}}</td>
+                <td>{{atividade.sessao_set.count}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% for inscricaosessao in inscricoes %}
+        <table>
+            <tr>
+                <h4>Sessão:</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaosessao.sessao}}</a></td>
+                <h4>Num participantes numa sessão</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaosessao.nparticipantes}}</a></td>
+            </tr>
+        </table>
+        {% endfor %}
+    
+        {% for inscricaotransporte in inscricoes %}
+        <table>
+            <tr>
+                <h4>Transporte::</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaotransporte.transporte}}</a></td>
+
+                <h4>Num passageiros:</h4>
+                <td><a href="{% url 'InscricaoUpdate' inscricao_id=inscricao.id %}">{{ inscricaotransporte.npassageiros}}</a></td>
+            </tr>
+        </table>
+        {% endfor %}
+    
+
+        <h4>Almoço - Num de Pratos:</h4>
+        {{ Inscricaotransporte.npassageiros}}
+        <hr>
+
+        <h4></h4>
+
+        <button type="submit">Submeter</button>
+        </form> {% endcomment %}
+        {% endblock content %}
+</body>
+
+</html>

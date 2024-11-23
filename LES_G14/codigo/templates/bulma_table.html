@@ -1,0 +1,217 @@
+{% load django_tables2 %}
+{% load i18n %}
+{% block table-wrapper %}
+{% block table %}
+<div class="table-wrapper">
+    <table
+        class="main-table table has-mobile-cards is-fullwidth is-striped {% block table_class %}{% endblock table_class %}"
+        {% if table.fixed %}style="table-layout: fixed;" {% endif %} {% render_attrs table.attrs %}>
+        {% block table.thead %}
+        {% if table.show_header %}
+        <thead {{ table.attrs.thead.as_html }}>
+            <tr>
+                {% block seta_th %}
+                {% endblock seta_th %}
+                {% for column in table.columns %}
+                <th {% if column.orderable %}class="orderable
+                    {% if request.GET.sort == column.order_by_alias %}is-sorting{% endif %}" {% endif %}
+                    {% if column.orderable %}
+                    onclick="window.location.href = '{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}';"
+                    {% endif %} {{ column.attrs.th.as_html }}>
+                    {% if column.attrs.abbr %}<abbr title="{{column.attrs.abbr.title}}">{% endif %}
+                        {{ column.header }}
+                        {% if column.attrs.abbr %}</abbr>{% endif %}
+                    {% if column.orderable and request.GET.sort == column.order_by_alias %}
+                    {% if column.order_by_alias|slice:"0:1" == "-" %}
+                    <span class="icon is-small"><i class="mdi mdi-menu-up"></i></span>
+                    {% else %}
+                    <span class="icon is-small"><i class="mdi mdi-menu-down"></i></span>
+                    {% endif %}
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        {% endif %}
+        {% endblock table.thead %}
+        {% block table.tbody %}
+        <tbody {{ table.attrs.tbody.as_html }}>
+            {% for row in table.paginated_rows %}
+            {% block table.tbody.row %}
+            <tr {{ row.attrs.as_html }}  style="word-wrap: break-word;">
+                {% block seta_tr %}
+                {% endblock seta_tr %}
+                {% for column, cell in row.items %}
+                <td {{ column.attrs.td.as_html }} data-label="{{column.header}}">
+                    {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endblock table.tbody.row %}
+            {% block detail %}
+            {% endblock detail %}
+            {% empty %}
+            {% if table.empty_text %}
+            {% block table.tbody.empty_text %}
+            <tr>
+                <td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td>
+            </tr>
+            {% endblock table.tbody.empty_text %}
+            {% endif %}
+            {% endfor %}
+        </tbody>
+        {% endblock table.tbody %}
+        {% block table.tfoot %}
+        {% if table.has_footer %}
+        <tfoot {{ table.attrs.tfoot.as_html }}>
+            <tr>
+                {% for column in table.columns %}
+                <td {{ column.attrs.tf.as_html }}>{{ column.footer }}</td>
+                {% endfor %}
+            </tr>
+        </tfoot>
+        {% endif %}
+        {% endblock table.tfoot %}
+    </table>
+</div>
+{% endblock table %}
+
+{% block pagination %}
+
+<div class="level">
+    <div class="level-left"></div>
+    <div class="level-right">
+        <div class="level-item">
+            <nav class="pagination" role="navigation" aria-label="pagination">
+                {% block pagination.range %}
+                {% for p in table.page|table_page_range:table.paginator %}
+                <ul class="pagination-list">
+                    <li>
+                        {% if p == table.page.number %}
+                        <a class="pagination-link is-current" href="">{{ p }}</a>
+                        {% elif p == '...' %}
+                        <span class="pagination-ellipsis">&hellip;</span>
+                        {% else %}
+                        <a class="pagination-link" href="{% querystring table.prefixed_page_field=p %}">
+                            {{ p }}
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
+                {% endfor %}
+                {% endblock pagination.range %}
+                {% block pagination.previous %}
+                <a role="button" {% if table.page.has_previous %}
+                    href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}" {% else %}
+                    disabled="disabled" {% endif %} class="pagination-previous"><span class="icon" aria-hidden="true"><i
+                            class="mdi mdi-chevron-left mdi-24px"></i></span></a>
+                {% endblock pagination.previous %}
+                {% block pagination.next %}
+                <a role="button" {% if table.page.has_next %}
+                    href="{% querystring table.prefixed_page_field=table.page.next_page_number %}" {% else %}
+                    disabled="disabled" {% endif %} class="pagination-next"><span class="icon" aria-hidden="true"><i
+                            class="mdi mdi-chevron-right mdi-24px"></i></span></a>
+                {% endblock pagination.next %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock pagination %}
+{% block scripts %}
+{% endblock scripts %}
+{% endblock table-wrapper %}
+
+<head>
+    <style>
+        th.orderable {
+            cursor: pointer;
+        }
+
+        th.orderable:hover {
+            border-color: #7a7a7a;
+        }
+
+        th.orderable.is-sorting {
+            border-color: #7a7a7a;
+        }
+
+        .table-wrapper .table {
+            margin-bottom: 0
+        }
+
+        .table-wrapper:not(:last-child) {
+            margin-bottom: 1.5rem
+        }
+
+        @media screen and (max-width:1023px) {
+            .table-wrapper {
+                overflow-x: auto
+            }
+        }
+
+        @media screen and (max-width:768px) {
+            .table.has-mobile-cards thead {
+                display: none
+            }
+
+            .table.has-mobile-cards tfoot th {
+                border: 0;
+                display: inherit
+            }
+
+            .table.has-mobile-cards tr {
+                -webkit-box-shadow: 0 2px 3px rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .1);
+                box-shadow: 0 2px 3px rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .1);
+                max-width: 100%;
+                position: relative;
+                display: block
+            }
+
+            .table.has-mobile-cards tr td {
+                border: 0;
+                display: inherit
+            }
+
+            .table.has-mobile-cards tr td:last-child {
+                border-bottom: 0
+            }
+
+            .table.has-mobile-cards tr:not(:last-child) {
+                margin-bottom: 1rem
+            }
+
+            .table.has-mobile-cards tr:not([class*=is-]) {
+                background: inherit
+            }
+
+            .table.has-mobile-cards tr:not([class*=is-]):hover {
+                background-color: inherit
+            }
+
+            .table.has-mobile-cards tr.detail {
+                margin-top: -1rem
+            }
+
+            .table.has-mobile-cards tr:not(.detail):not(.is-empty):not(.table-footer) td {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex;
+                width: auto;
+                -webkit-box-pack: justify;
+                -ms-flex-pack: justify;
+                justify-content: space-between;
+                text-align: right;
+                border-bottom: 1px solid #f5f5f5
+            }
+
+            .table.has-mobile-cards tr:not(.detail):not(.is-empty):not(.table-footer) td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                padding-right: .5em;
+                text-align: left
+            }
+        }
+    </style>
+    {% block style %}
+    {% endblock style %}
+</head>

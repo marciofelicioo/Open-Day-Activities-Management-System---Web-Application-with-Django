@@ -1,0 +1,8 @@
+
+
+<option selected value='{{default.key}}'>{{default.value}}</option>
+{% for option in options %}
+    {% if option.key != default.key %}
+        <option  value="{{ option.key}}">{{ option.value }}</option>
+    {% endif %}
+{% endfor %}

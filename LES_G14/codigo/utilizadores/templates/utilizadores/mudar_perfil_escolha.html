@@ -1,0 +1,40 @@
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Alterar Perfil{% endblock title %}
+
+
+
+{% block content %}
+
+<div>
+
+
+
+
+            <div style="margin-bottom:5%;margin-top:5%;">
+                <h2 class="title is-5" style="text-align: center;" >Por favor selecione o tipo de utilizador que pretende</h2>
+            </div>
+            <div class="columns is-mobile is-centered">
+            <div class="column is-narrow">
+            <div class="buttons has-addons" >
+                {% for user in utilizadores %}
+                    
+                    {% if  user != x %}
+                    <a href="{% url 'utilizadores:mudar-perfil' forloop.counter%}">
+                        <button class="button">{{user}}</button>
+                    </a>
+                    {% endif %}
+                    
+                {% endfor %}
+            </div>
+            </div>
+            </div>
+    </div>
+
+<button type="button" value="Voltar" class="button is-outlined" style="margin-left: 10%;margin-top:10%;" onclick="history.back();">Voltar</button>
+
+    {% endblock content %}
+
+</div>

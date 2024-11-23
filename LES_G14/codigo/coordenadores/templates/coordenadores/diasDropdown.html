@@ -1,0 +1,5 @@
+{% load l10n %}
+<option value="">---------</option>
+{% for dia in dias %}
+<option value="{{ dia|date:'Y-m-d'}}">{{ dia}}</option>
+{% endfor %}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+{% load static %}
+{% load inscricoes_extras %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório sobre roteiros/atividades - Universidade do Algarve</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @frame footer_frame {
+                /* Static frame */
+                -pdf-frame-content: footer_content;
+                left: 50pt;
+                width: 512pt;
+                top: 772pt;
+                height: 20pt;
+            }
+        }
+
+        .section-header {
+            text-align: center;
+            padding: 3px;
+            padding-top: 10px;
+            background-color: #eee;
+            border: 1px solid #000;
+            font-weight: bold;
+        }
+
+        .atividades-table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .atividades-table th,
+        .atividades-table td {
+            padding: 3px;
+            padding-top: 6px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .atividades-table thead th {
+            vertical-align: bottom;
+            border-bottom: 1.2px solid #000;
+            background-color: #eee
+        }
+
+        .has-text-centered {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="footer_content">Relatório sobre Roteiros/Atividades - página
+        <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
+    <img src="{{ 'img/ualg-logo.png'|get64 }}" alt="Ualg Logo" height="100">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img class="has-text-centered" src="{{ 'img/logo-large.png'|get64 }}" alt="Dia Aberto Logo" height="100">
+    <pdf:spacer height="20px" />
+    <br>
+    {% if dia %}
+    <h1 class="has-text-centered">RELATÓRIO DOS ROTEIROS/ATIVIDADES DO DIA {{dia}}</h1>
+    {% elif ano %}
+    <h1 class="has-text-centered">RELATÓRIO DOS ROTEIROS/ATIVIDADES DO ANO {{ano}}</h1>
+    {% else %}
+    <h1 class="has-text-centered">RELATÓRIO DOS ROTEIROS/ATIVIDADES</h1>
+    {% endif %}
+    <br>
+
+    <table class="atividades-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Sessoes</th>
+                <th>Atividades</th>
+                {% if not dia %}
+                <th>Dia</th>
+                {% endif %}
+                <th>Início</th>
+                <th>Fim</th>
+                <th>Inscritos</th>
+                <th>Presenças</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sessao in sessoes %}
+            <tr>
+                {% if sessao.atividadeid %}
+                <td>{{sessao.atividadeid.nome}}</td>
+                <td>Atividade</td>
+                <td>{{sessao.atividadeid.numero_de_sessoes}}</td>
+                <td>-</td>
+                {% else %}
+                <td>{{sessao.roteiroid.nome}}</td>
+                <td>Roteiro</td>
+                <td>{{sessao.roteiroid.numero_de_sessoes}}</td>
+                <td>{{sessao.roteiroid.numero_de_atividades}}</td>
+                {% endif %}
+                {% if not dia %}
+                <td>{{sessao.dia}}</td>
+                {% endif %}
+                <td>{{sessao.horarioid.inicio}}</td>
+                <td>{{sessao.horarioid.fim}}</td>
+                <td>{{sessao.ninscritos}}/{{sessao.vagas|add:sessao.ninscritos}}</td>
+                <td>{{sessao.nr_presentes}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

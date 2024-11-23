@@ -1,0 +1,19 @@
+<tr>
+    <input type="hidden" name="{{form_id}}" id="id_{{form_id}}">
+    <td data-label="Nome">
+        <input type="text" name="{{form_nome}}" class="input" maxlength="255" id="id_{{form_nome}}" required>
+    </td>
+     <td data-label="Sigla">
+        <input type="text" name="{{form_sigla}}" class="input" maxlength="32" id="id_{{form_sigla}}" required>
+    </td>
+    <td data-label="campus">
+        <div class="select">
+            <select name="{{form_unidadeorganicaid}}" class="input" id="id_{{form_unidadeorganicaid}}">
+                <option value="" selected="">---------</option>
+                {% for option in options %}
+                    <option value="{{option.id}}">{{option}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </td>
+</tr>

@@ -1,0 +1,69 @@
+{% extends 'bulma_table_details.html' %}
+
+
+{% block details_content %}
+
+<table class="table is-fullwidth has-mobile-cards">
+    <tbody>
+        <tr>
+            <td ><strong>Inicio submissao Atividades:</strong></th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.datapropostasatividadesincio}}</span>
+            </td>
+        </tr>
+    
+        <tr style="border-bottom: 1px solid #ddd">
+            <td><strong>Fim submissao Atividades:</strong></th>
+            <td style="font-weight: normal;">
+                <span> {{row.record.dataporpostaatividadesfim}} </span>
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <td class="th-wrap"><strong>Inicio Inscrições:</strong></th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.datainscricaoatividadesinicio}}</span>
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+
+            <td class="th-wrap"><strong>Fim Inscrições:</strong></td>
+            <td style="font-weight: normal;">
+                <span> {{row.record.datainscricaoatividadesfim}} </span>
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <td class="th-wrap"><strong>Preço Professores:</strong></th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.precoprofessores}}€</span>
+            </td>           
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+
+            <td class="th-wrap"><strong>Preço Alunos:</strong></td>
+            <td style="font-weight: normal;">
+                <span> {{row.record.precoalunos}}€</span>
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+
+            <td class="th-wrap"><strong>Escala de sessões:<strong></td>
+            <td style="font-weight: normal;">
+                <span> {{row.record.escalasessoes}} </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<table class='table is-fullwidth' style="margin-top: 15px">
+    <thead>
+        <th>Descrição:</th>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #ddd">
+            <td>
+                <textarea class="textarea" disabled style="resize: none;">{{row.record.descricao}}</textarea>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock details_content %}

@@ -1,0 +1,79 @@
+
+{% extends 'app.html' %}
+{% load static %}
+{% block content %}
+{% load configuracao_tags %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+	<ul>
+	<li><a href="{% url 'home' %}">Início</a></li>
+	<li><a href="{% url 'configuracao:verTemas' %}">Temas</a></li>
+	<li class='is-active'><a href="">Criar Tema</a></li>
+	</ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+	<form method="POST" action="">
+		<div id="id_removed_rows" style="display:none;"></div>
+		{% csrf_token %}
+    {% if form.non_field_errors %}
+      <article class="message is-danger">
+        <div class="message-body">
+          <p style="text-align: center;">
+          {% for error in form.non_field_errors %}
+            <strong>{{ error|escape }}</strong>
+          {% endfor %}
+          </p>
+        </div>
+      </article>
+    {% endif %}
+		<div class="b-steps">
+			<section class="step-content">
+				<div class="step-item">
+					<div style="padding: 1rem 2vw 0px">
+
+						<div class="columns">
+							<div class="column is-half">
+								<strong>{{form.nome.errors}}</strong>
+								<div class="field">
+									<label class="label">Tema</label>
+									<div class="control">
+										{{form.tema}}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="column is-8 is-offset-2">
+						<div class="level">
+							<div class="level-left">
+								<a class="button is-large is-outlined" type="button" href="{% url 'configuracao:verTemas' %}">
+								<span>Cancelar</span>
+								</a>
+							</div>
+							<div class="level-right">
+								<button class="button is-large is-success is-outlined is-link" type="submit">
+									<span>Confirmar</span>
+									<span class="icon is-medium">
+										<i class="mdi mdi-check mdi-36px"></i>
+									</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</form>
+</div>
+
+<style>
+	.label {
+	font-weight: normal;
+}
+.b-steps .steps .step-items .step-item .step-details .step-title {
+	font-size: 1rem;
+}
+</style>
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}

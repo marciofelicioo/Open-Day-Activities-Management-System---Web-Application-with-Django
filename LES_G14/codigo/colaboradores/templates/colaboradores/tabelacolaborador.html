@@ -1,0 +1,54 @@
+{% extends 'bulma_table_details.html' %}
+{% load atividadestags %}
+
+{% block details_content %}
+
+<table class="table has-mobile-cards is-fullwidth">
+    <tbody>
+
+        <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Local:</th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.espacoid.edificio.campus.nome}} - {{row.record.espacoid.edificio}} - {{row.record.espacoid}}</span>
+            </td>           
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Tema:</th>
+            <td  style="font-weight: normal;">
+                <span>{{row.record.get_tema}}</span>
+            </td>           
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Publico Alvo:</th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.publicoalvo}}</span>
+            </td>           
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Departamento:</th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.professoruniversitarioutilizadorid.departamento.nome}}</span>
+            </td>           
+        </tr>
+
+        </tr>
+                <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Coordenador Responsável:</th>
+            <td style="font-weight: normal;">
+                <span>{{row.record.get_coord.full_name}}</span>
+            </td>           
+        </tr>
+          
+        <tr style="border-bottom: 1px solid #ddd">
+            <th class="th-wrap">Descrição:</th>
+            <td></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd">
+            <td colspan="4">
+                <textarea class="textarea" disabled style="resize: none;">{{row.record.descricao}}</textarea>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock details_content %}

@@ -1,0 +1,284 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+{% extends 'app.html' %}
+
+{% block title %}- Notificações{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/notificacoes.css' %}">
+{% endblock load %}
+{% load poll_extras %}
+{% load notificacoes_extras %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}">Início</a></li>
+            <li class="is-active"><a>Notificações</a></li>
+        </ul>
+    </nav>
+    <div class="columns" id="mail-app">
+        <aside class="column is-2 aside hero is-fullheight">
+            <div>
+                <div class="compose has-text-centered">
+                    <a href="{% url 'notificacoes:enviar-notificacao' %}" class="button is-danger is-block is-bold">
+                        <span class="compose">Enviar Mensagem</span>
+                    </a>
+                </div>
+                <div class="main">
+                    {% if categoria == 0 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="item active"><span
+                            class="name">Tudo</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="item"><span
+                            class="name">Tudo</span></a>
+                    {% endif %}
+                    {% if categoria == 1 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 1 0 %}" class="item active"><span
+                            class="name">Não Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 1 0 %}" class="item"><span
+                            class="name">Não Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 2 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 2 0 %}" class="item active"><span
+                            class="name">Lidas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 2 0 %}" class="item"><span
+                            class="name">Lidas</span></a>
+                    {% endif %}
+                    {% if categoria == 3 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 3 0 %}" class="item active"><span
+                            class="name">Individuais</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 3 0 %}" class="item"><span
+                            class="name">Individuais</span></a>
+                    {% endif %}
+                    {% if categoria == 4 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 4 0 %}" class="item active"><span
+                            class="name">Grupos</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 4 0 %}" class="item"><span
+                            class="name">Grupos</span></a>
+                    {% endif %}
+                    {% if categoria == 5 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 5 0 %}" class="item active"><span
+                            class="name">Informativas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 5 0 %}" class="item"><span
+                            class="name">Informativas</span></a>
+                    {% endif %}
+                    {% if categoria == 6 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 6 0 %}" class="item active"><span
+                            class="name">Alertas</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 6 0 %}" class="item"><span
+                            class="name">Alertas</span></a>
+                    {% endif %}
+                    {% if categoria == 7 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 7 0 %}" class="item active"><span
+                            class="name">Cancelamentos</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 7 0 %}" class="item"><span
+                            class="name">Cancelamentos</span></a>
+                    {% endif %}
+                    {% if categoria == 8 %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 8 0 %}" class="item active"><span
+                            class="name">Validações</span></a>
+                    {% else %}
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 8 0 %}" class="item"><span
+                            class="name">Validações</span></a>
+                    {% endif %}</d iv>
+                </div>
+        </aside>
+        <div class="column is-4 messages hero is-fullheight">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:ler-notificacoes'%}" class="button is-small"><div data-tooltip="Marcar notificações como lidas"><i class="mdi mdi-email-mark-as-unread mdi-18px"></i></div></a>
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' categoria atual.id %}" class="button is-small">
+                        <i class="mdi mdi-reload mdi-18px"></i>
+                    </a>
+                </div>
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="button is-small"><i class="fa fa-inbox"></i></a>
+                    <a class="button is-small"><div data-tooltip="Todas as notificações foram geradas automáticamente"><i class="fa fa-question-circle"></i></div></a>
+                    <a onclick="alert.render('Tem a certeza que pretende eliminar todas as notificações desta categoria?','{% url 'notificacoes:limpar-notificacoes' categoria %}')"
+                        class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+
+
+                <div class="control is-grouped pg">
+                    <div class="title">{{ notificacoes.start_index }}-{{ notificacoes.end_index }} de
+                        {{ total }}
+                    </div>
+                    {% if notificacoes.has_previous %}
+                    <a class="button is-link" href="?page={{notificacoes.previous_page_number}}"><i
+                            class="fa fa-chevron-left"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-left"></i></a>
+                    {% endif %}
+                    {% if notificacoes.has_next %}
+                    <a class="button is-link" href="?page={{notificacoes.next_page_number}}"><i
+                            class="fa fa-chevron-right"></i></a>
+                    {% else %}
+                    <a class="button is-link" href="#"><i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="inbox-messages" id="inbox-messages">
+
+                <div class="card">
+
+                    <div class="card-content">
+                        {% for notificacao in notificacoes %}
+
+                        {% if notificacao.id == atual.id %}
+                        <a href="{% url 'notificacoes:categorias-notificacao-automatica' categoria notificacao.id %}?page={{notificacoes.number}}"
+                            class="panel-block" style="background: #A0A0A0; ">
+                            {% elif notificacao.unread == False %}
+
+                            <a href="{% url 'notificacoes:categorias-notificacao-automatica' categoria notificacao.id %}?page={{notificacoes.number}}"
+                                class="panel-block">
+                                {% else %}
+
+                                <a href="{% url 'notificacoes:categorias-notificacao-automatica' categoria notificacao.id %}?page={{notificacoes.number}}"
+                                    class="panel-block" style=" background: Gainsboro; ">
+                                    {% endif %}
+
+
+
+
+                                    {% if notificacao.level == "info" %}
+                                    <span class="icon has-text-info">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                    {% elif notificacao.level == "success" %}
+                                    <span class="icon has-text-success">
+                                        <i class="fas fa-check-square"></i>
+                                    </span>
+                                    {% elif notificacao.level == "warning" %}
+                                    <span class="icon has-text-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    {% elif notificacao.level == "error" %}
+                                    <span class="icon has-text-danger">
+                                        <i class="fas fa-ban"></i>
+                                    </span>
+                                    {% endif %}
+                                    <p>
+                                        <strong>
+                                            {{notificacao.description}}
+                                        </strong>
+                                    </p>
+
+                                </a>
+
+
+                                {%endfor%}
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="column is-6 message hero is-fullheight is-active" id="message-pane">
+            <div class="action-buttons">
+                <div class="control is-grouped">
+                    <a href="{% url 'notificacoes:categorias-notificacao-automatica' 0 0 %}" class="button is-small"><i class="fa fa-inbox"></i></a>
+                    <a class="button is-small"><div data-tooltip="Esta mensagem foi gerada automáticamente"><i class="fa fa-question-circle"></i></div></a>
+                    <a onclick="alert.render('Tem a certeza que pretende eliminar esta notificação?','{% url 'notificacoes:apagar-notificacao-automatica' categoria atual.id %}?page={{notificacoes.number}}')"
+                        class="button is-small">
+                        <i class="mdi mdi-trash-can-outline mdi-18px"></i>
+                    </a>
+                </div>
+                {% if atual.description == "Pedido de cancelamento da tarefa" and atual.deleted == False %}
+                <div class="control is-grouped">
+                    <a href="{% url 'colaboradores:validar-cancelamento-tarefa' atual.id %}?page={{notificacoes.number}}"
+                        class="button is-small"><i>Confirmar</i></a>
+                    <a onclick="alert.render('Tem a certeza que pretende rejeitar este pedido?','{% url 'colaboradores:rejeitar-cancelamento-tarefa' atual.id %}?page={{notificacoes.number}}')"
+                        class="button is-small"><i>Rejeitar</i></a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="box message-preview">
+                <div class="top">
+                    <div class="avatar">
+                        <img src="{% static 'img/user.png' %}" alt="Dia Aberto">
+                    </div>
+                    <div class="address">
+                        <div class="name">{{atual.actor_object_id|get_user_name}}
+                            {% if atual.public == False %}
+                            <small>({{atual.actor_object_id|get_user_type}})</small>
+                            {% endif %}
+                        </div>
+                        <div class="email">{{atual.actor_object_id|get_email}}</div>
+                        
+                        
+                        
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <div class="columns">
+                            <div class="column">
+                                <div>
+
+                                    <div class="field is-horizontal">
+                                        <div class="field-label is-normal">
+                                            <label class="label">Data de Envio</label>
+                                        </div>
+                                        <div class="field-body">
+                                            <div class="field has-addons has-background-light">
+                                                <p class="control has-background-light" style="padding: 10px 30px">
+                                                    {{atual.timestamp}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field is-horizontal">
+                                        <div class="field-label is-normal">
+                                            <label class="label">Título</label>
+                                        </div>
+                                        <div class="field-body">
+                                            <div class="field has-addons has-background-light">
+                                                <p class="control has-background-light" style="padding: 10px 30px">
+                                                    {{atual.description}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="field is-horizontal">
+                                        <div class="field-label is-normal">
+                                            <label class="label">Mensagem</label>
+                                        </div>
+                                        <div class="field-body">
+                                            <div class="field has-addons has-background-light">
+                                                <p class="control" style="padding: 10px 30px">
+                                                    {{atual.verb}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

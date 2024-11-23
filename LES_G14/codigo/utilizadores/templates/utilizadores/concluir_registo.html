@@ -1,0 +1,119 @@
+{% extends 'app.html' %}
+
+
+
+{% block title %}- Registar{% endblock title %}
+
+
+
+{% block content %}
+
+<div>
+
+
+    <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-account"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Escolher Perfil</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-circle-edit-outline mdi-24px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Preencher Campos</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+            <div style="margin-bottom:3%;margin-top:3%;">
+                <h2 class="title is-5" style="text-align: center;" >Registo feito com sucesso!</h2>
+            </div>
+
+            
+            {% if participante == "True" %}
+                <div style="text-align: center;position:center">
+                <p>Obrigado por se registar na plataforma do Dia Aberto</p>
+                </div>
+            {% elif participante == "False" %}
+                <div style="text-align: center;position:center">
+                <p>Por favor aguarde o email de confirmação</p>
+                </div>
+            {% elif participante == "Admin" %}
+                <div style="text-align: center;position:center">
+                <p>Novo utilizador criado com sucesso!</p>
+                </div>
+            {% endif %}    
+    </div>
+
+    <div style="text-align: center;position:center;margin-top:4%">
+        {% if participante == "Admin" %}
+        <a href="{% url 'utilizadores:consultar-utilizadores' %}">
+            <button  class="button">Continuar</button>
+        </a>
+        {% else %}
+        <a href="{% url 'home' %}">
+            <button  class="button">Continuar</button>
+        </a>
+        {% endif %}
+    </div>
+
+    {% endblock content %}
+
+</div>

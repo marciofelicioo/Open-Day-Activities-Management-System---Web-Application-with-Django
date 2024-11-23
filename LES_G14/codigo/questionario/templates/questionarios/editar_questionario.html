@@ -1,0 +1,383 @@
+{% extends 'app.html' %}
+
+{% block content %}
+<div class="container">
+    <div style="padding: 3rem 2vw 1rem;">
+        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem;">Editar Questionário</h2>
+        <form method="post" id="formularioQuestionario" data-titulos-existentes="{{ titulos_existentes|join:',' }}" data-descricoes-existentes="{{ descricoes_existentes|join:',' }}">
+            {% csrf_token %}
+            <div id="mensagemErroContainer" style="display: none; margin-top: 20px;">
+                <div class="notification is-danger is-light" style="text-align: center; width: 100%; opacity: 0.9;">
+                    <p id="mensagemErro"></p>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Título</label>
+                <div class="control">
+                    <input name="titulo" class="input" type="text" value="{{ questionario.titulo }}" maxlength="200" required>
+                </div>
+            </div>
+            
+            <div class="field">
+                <label class="label">Descrição</label>
+                <div class="control">
+                    <textarea name="descricao" class="textarea">{{ questionario.descricao }}</textarea>
+                </div>
+            </div>
+            
+            <input type="hidden" id="totalPerguntas" value="{{ perguntas_e_opcoes|length }}">
+            <div id="perguntas-container">
+                {% for pergunta in perguntas_e_opcoes %}
+                <input type="hidden" name="pergunta_id_{{ forloop.counter }}" value="{{ pergunta.id }}">
+                
+                <div class="box" id="perguntaBox{{ forloop.counter }}">
+                    <div class="field">
+                        <label class="label">Tema</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="tema{{ forloop.counter }}" required>
+                                    <option value="" disabled>Escolha um tema</option>
+                                    {% for tema in temas %}
+                                    <option value="{{ tema.pk }}" {% if pergunta.tema_id == tema.pk %} selected {% endif %}>{{ tema }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Pergunta</label>
+                        <div class="control">
+                            <input type="text" name="perguntas{{ forloop.counter }}" class="input" value="{{ pergunta.texto }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <div class="control">
+                            <div class="select">
+                                <select id="tipoResposta{{ forloop.counter }}" name="tipoResposta{{ forloop.counter }}" required>
+                                    <option value="">Selecione o tipo de resposta</option>
+                                    <option value="escolhaMultipla" {% if pergunta.tipo == 'escolhaMultipla' %}selected{% endif %}>Escolha Múltipla</option>
+                                    <option value="inteiro" {% if pergunta.tipo == 'inteiro' %}selected{% endif %}>Inteiro</option>
+                                    <option value="porExtenso" {% if pergunta.tipo == 'porExtenso' %}selected{% endif %}>Por Extenso</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="containerResposta{{ forloop.counter }}" class="opcoesResposta" style="margin-top: 10px;">
+                        {% if pergunta.tipo == 'escolhaMultipla' or pergunta.tipo == 'inteiro' %}
+                        {% for opcao in pergunta.opcoes %}
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input type="text" name="respostaOpcao{{ forloop.parentloop.counter }}[]" class="input" value="{{ opcao }}" required>
+                            </div>
+                            <div class="control">
+                                <button type="button" class="button is-danger" onclick="this.parentNode.parentNode.remove()">-</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <button type="button" class="button is-info add-option-button" onclick="adicionarOpcaoResposta(document.getElementById('containerResposta{{ forloop.counter }}'), {{ forloop.counter }}, '{{ pergunta.tipo }}')">Adicionar Opção</button>
+                        {% endif %}
+                        
+                        {% if pergunta.tipo == 'porExtenso' %}
+                        <h1>Caso pretendas alterar para escolha Múltipla, cria outra pergunta e remove esta</h1>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="field is-grouped is-justify-content-space-between" style="margin-top: 10px; justify-content: center;">
+                        <button type="button" class="button is-danger is-light" onclick="removerTemaComPergunta('perguntaBox{{ forloop.counter }}', {{ pergunta.id }})">Remover Pergunta</button>
+                        
+                    </div>
+                    <hr>
+                </div>
+                {% endfor %}
+                
+                <!-- Aqui adiciono as novas perguntas, não misturo com as pré existentes na base de dados -->
+            </div>        
+            <div style="display: flex; justify-content: flex-start; margin-top: 20px;">
+                <button type="button" class="button is-primary" onclick="adicionarTemaComPergunta()">Adicionar Pergunta</button>
+            </div>           
+            <br>
+            <div class="field is-grouped is-grouped-centered" style="margin-top: 20px;">
+                <div class="control">
+                    <a href="{% url 'questionario:listar-questionario' %}" class="button is-danger is-light">Cancelar</a>
+                </div>
+                <div class="control">
+                    <button type="submit" class="button is-success is-light">Salvar Questionário</button>
+                </div>
+            </div>
+        </form>
+    </div>          
+</div>
+<script type="text/javascript">
+    var urlRemoverPergunta = '{% url "questionario:remover_pergunta" %}';
+</script>
+<script>
+    
+    let temaCount = document.querySelectorAll('#perguntas-container .box').length;
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('formularioQuestionario');
+        if (form) {
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                verificarPerguntas();
+            };
+        }
+        
+    });
+    
+    function adicionarTemaComPergunta() {
+        temaCount++;
+        const temaDiv = document.createElement('div');
+        temaDiv.classList.add('tema-com-pergunta', 'box');
+        temaDiv.setAttribute('id', 'tema' + temaCount);
+        temaDiv.innerHTML = `
+        <div class="field">
+            <label class="label">Tema</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="tema${temaCount}" required onchange="alterarTipoResposta(this, ${temaCount})">
+                        <option value="" disabled selected>Escolha um tema</option>
+                        {% for tema in temas %}
+                        <option value="{{ tema.pk }}">{{ tema }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Pergunta</label>
+            <div class="control">
+                <input type="text" name="perguntas${temaCount}" class="input" placeholder="Digite a pergunta aqui" required>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <div class="select">
+                    <select id="tipoResposta${temaCount}" name="tipoResposta${temaCount}" onchange="alterarTipoResposta(${temaCount})" required>
+                        <option value="">Selecione o tipo de resposta</option>
+                        <option value="escolhaMultipla">Escolha Múltipla</option>
+                        <option value="inteiro">Inteiro</option>
+                        <option value="porExtenso">Por Extenso</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="containerResposta${temaCount}" class="opcoesNovas" style="margin-top: 10px;">
+            <!-- Container para opções de resposta Novas -->
+        </div>
+        <div class="field is-grouped is-justify-content-space-between" style="margin-top: 10px; justify-content: center;">
+            <button type="button" class="button is-danger is-light" onclick="removerTemaComPergunta2(this)">Remover Pergunta</button>
+        </div>
+        <hr>
+        `;
+        document.getElementById('perguntas-container').appendChild(temaDiv);
+    }
+    
+    
+    function alterarTipoResposta(temaCount) {
+        const tipoResposta = document.getElementById(`tipoResposta${temaCount}`).value;
+        const container = document.getElementById(`containerResposta${temaCount}`);
+        container.innerHTML = ''; // Limpar o container para novas escolhas
+        
+        if (tipoResposta === 'escolhaMultipla' || tipoResposta === 'inteiro') {
+            adicionarOpcaoResposta(container, temaCount, tipoResposta);
+        }
+    }
+    
+    function adicionarOpcaoResposta(container, temaCount, tipo) {
+        // Verifica se já existe um botão "Adicionar opção" e remove-o temporariamente
+        const existingAddButton = container.querySelector('.add-option-button');
+        if (existingAddButton) {
+            container.removeChild(existingAddButton);
+        }
+        
+        const divOpcao = document.createElement('div');
+        divOpcao.classList.add('field', 'has-addons');
+        const input = document.createElement('input');
+        input.type = (tipo === 'inteiro') ? 'number' : 'text';
+        input.name = `respostaOpcao${temaCount}[]`;
+        input.placeholder = (tipo === 'inteiro') ? 'Digite um número' : 'Digite a opção de escolha';
+        input.classList.add('input');
+        input.required = true;
+        
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.innerText = '-';
+        button.classList.add('button', 'is-danger');
+        button.onclick = function() { container.removeChild(divOpcao); };
+        
+        divOpcao.appendChild(input);
+        divOpcao.appendChild(button);
+        container.appendChild(divOpcao);
+        
+        // Recria o botão "Adicionar opção" e adiciona-o de volta ao final do container
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.innerText = 'Adicionar opção';
+        addButton.classList.add('button', 'is-info', 'add-option-button'); // Adiciona uma classe para facilitar a identificação
+        addButton.onclick = function() { adicionarOpcaoResposta(container, temaCount, tipo); };
+        container.appendChild(addButton);
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    var csrftoken = getCookie('csrftoken');
+    
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+    function removerTemaComPergunta2(buttonElement) {
+        const perguntaDiv = buttonElement.closest('.box');
+        perguntaDiv.remove();
+    }
+    function removerTemaComPergunta(temaId, perguntaId) {
+        const perguntasInputs = document.querySelectorAll('#formularioQuestionario input[name^="perguntas"]');
+        const mensagemErro = document.getElementById('mensagemErro');
+        const mensagemErroContainer = document.getElementById('mensagemErroContainer');
+        mensagemErro.innerHTML = '';
+        mensagemErroContainer.style.display = 'none';
+        if (perguntasInputs.length > 1) {
+            console.log("Tema ID: ", temaId); // Deve mostrar algo como "perguntaBox1"
+            console.log("Pergunta ID: ", perguntaId);
+            
+            // Chamada AJAX para remover a pergunta
+            $.ajax({
+                url: urlRemoverPergunta, // Atualize com o caminho correto
+                type: 'POST',
+                data: {
+                    'pergunta_id': perguntaId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data);
+                    if(data.success) {
+                        const temaDiv = document.getElementById(temaId);
+                        if (temaDiv) {
+                            temaDiv.remove();
+                        }
+                    } else {
+                        alert('Erro ao remover pergunta: ' + data.error);
+                    }
+                }
+            });
+        }
+        else{
+            mensagemErro.innerHTML += 'Precisas de pelo menos uma pergunta para salvar o questionario<br>';
+            mensagemErroContainer.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+    }
+    
+    function verificarPerguntas() {
+        const perguntasInputs = document.querySelectorAll('#formularioQuestionario input[name^="perguntas"]');
+        const opcoesRespostaContainers = document.querySelectorAll('.opcoesResposta');
+        const opcoesRespostaContainersNovas = document.querySelectorAll('.opcoesNovas');
+        const mensagemErro = document.getElementById('mensagemErro');
+        const mensagemErroContainer = document.getElementById('mensagemErroContainer');
+        
+        const titulosExistentes = document.getElementById('formularioQuestionario').dataset.titulosExistentes.split(',').map(function(titulo) {
+            return titulo.toLowerCase();
+        });
+        
+        const descricoesExistentes = document.getElementById('formularioQuestionario').dataset.descricoesExistentes.split(',').map(function(descricao) {
+            return descricao.toLowerCase();
+        });
+        
+        
+        let valoresPerguntas = new Set();
+        let valoresOpcoes = new Set();
+        let formularioValido = true;
+        
+        mensagemErro.innerHTML = '';
+        mensagemErroContainer.style.display = 'none';
+        
+        const tituloInput = document.querySelector('#formularioQuestionario input[name="titulo"]');
+        const descricaoTextarea = document.querySelector('#formularioQuestionario textarea[name="descricao"]');
+        if (titulosExistentes.includes(tituloInput.value.trim().toLowerCase())) {
+            mensagemErro.innerHTML += 'Já existe um questionário com este título. Por favor, escolha um título diferente.<br>';
+            formularioValido = false;
+        }
+        if (descricoesExistentes.includes(descricaoTextarea.value.trim().toLowerCase())) {
+            mensagemErro.innerHTML += 'Já existe um questionário com esta descrição. Por favor, escolha uma descrição diferente.<br>';
+            formularioValido = false;
+        }
+        
+        if (perguntasInputs.length === 0) {
+            mensagemErro.innerHTML += 'Não é possível editar um questionário sem perguntas. Por favor, adicione pelo menos uma pergunta.<br>';
+            formularioValido = false;
+        }
+        
+        perguntasInputs.forEach(input => {
+            let valorPergunta = input.value.trim().toLowerCase();
+            if (valorPergunta === '') {
+                mensagemErro.innerHTML += 'Por favor, preencha todas as perguntas antes de salvar o questionário.<br>';
+                formularioValido = false;
+            } else if (valoresPerguntas.has(valorPergunta)) {
+                mensagemErro.innerHTML += `A pergunta "${input.value.trim()}" está duplicada.<br>`;
+                formularioValido = false;
+            }
+            valoresPerguntas.add(valorPergunta);
+        });
+        opcoesRespostaContainers.forEach((container, index) => {
+            let opcoes = [...container.querySelectorAll('input[type="text"], input[type="number"]')];
+            let valoresOpcoes = new Set();
+            opcoes.forEach(opcao => {
+                let valorOpcao = opcao.value.trim().toLowerCase();
+                if (valoresOpcoes.has(valorOpcao)) {
+                    mensagemErro.innerHTML += `Foram encontradas opções de resposta duplicadas na pergunta: "${perguntasInputs[index].value.trim()}".<br>`;
+                    formularioValido = false;
+                }
+                valoresOpcoes.add(valorOpcao);
+            });
+        });
+        opcoesRespostaContainersNovas.forEach((container, index) => {
+            let opcoes = [...container.querySelectorAll('input[type="text"], input[type="number"]')];
+            let valoresOpcoes = new Set();
+            opcoes.forEach(opcao => {
+                let valorOpcao = opcao.value.trim().toLowerCase();
+                if (valoresOpcoes.has(valorOpcao)) {
+                    mensagemErro.innerHTML += `Foram encontradas opções de resposta duplicadas na "${index + 1}"pergunta adicionada.<br>`;
+                    formularioValido = false;
+                }
+                valoresOpcoes.add(valorOpcao);
+            });
+        });
+        // Mostra o container de mensagem se houver mensagens de erro
+        if (!formularioValido) {
+            mensagemErroContainer.style.display = 'block';
+            window.scrollTo(0, 0); // Rola para o topo para garantir que o usuário veja a mensagem
+        } else {
+            document.getElementById('formularioQuestionario').submit();
+        }
+    }
+    
+    
+    
+</script>
+
+
+
+{% endblock %}
+{% block title %}
+- Editar Questionário
+{% endblock %}

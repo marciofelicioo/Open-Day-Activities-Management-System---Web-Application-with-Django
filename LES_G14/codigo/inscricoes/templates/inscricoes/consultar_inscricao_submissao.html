@@ -1,0 +1,132 @@
+{% extends 'app.html' %}
+{% load static %}
+
+{% block title %}- Inscrição{% endblock title %}
+
+{% block scripts %}
+<script>
+    window.onpageshow = function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    };
+
+    function navigate_step(step) {
+        location.href = "{% url 'inscricoes:consultar-inscricao' pk=inscricao.pk step=12345 %}".replace(/12345/, step
+            .toString());
+    }
+</script>
+{% endblock scripts %}
+
+{% block content %}
+<div>
+    <nav aria-label="breadcrumbs" class="breadcrumb">
+        <ul>
+            <li><a href="{% url 'home' %}" class="router-link-active">Início</a></li>
+            <li class="is-active"><a href="" class="router-link-exact-active router-link-active">Criar
+                    Inscrição</a></li>
+        </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem;">
+        <div class="steps is-success">
+            <div class="step-item is-success{% if step == 0 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(0)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-account"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Responsável</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 1 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(1)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi {% if individual %}mdi-ballot{% else %}mdi-school{% endif %}"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">{% if individual %}Inscrição{% else %}Escola{% endif %}</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 2 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(2)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-train-car"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Transporte</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 3 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(3)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-food-apple"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Almoço</p>
+                </div>
+            </div>
+            <div class="step-item is-success{% if step == 4 %} is-active{% else %} is-completed{% endif %}"
+                onclick="navigate_step(4)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-calendar-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Sessões</p>
+                </div>
+            </div>
+            <div class="step-item is-success is-active" onclick="navigate_step(5)">
+                <div class="step-marker">
+                    <span class="icon">
+                        <i class="mdi mdi-check"></i>
+                    </span>
+                </div>
+                <div class="step-details">
+                    <p class="step-title">Submissão</p>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+            Resumo da Inscrição
+        </h2>
+        <p>A sua inscrição no Dia Aberto está concluída!</p>
+        <br />
+        <p>Um e-mail de confirmação foi enviado para o e-mail
+            <strong>{{inscricao.responsavel_set.first.email}}</strong>.</p>
+        <br />
+        <p>Foi criado um ficheiro PDF com as informações da sua inscrição, pronto a imprimir.</p>
+        <br />
+        <button type="button" class="button is-danger"
+            onclick="location.href='{% url 'inscricoes:inscricao-pdf' inscricao.pk %}';"><span class="icon is-small"><i
+                    class="mdi mdi-download"></i></span> <span> Obter PDF </span>
+        </button>
+        <hr />
+        <div class="column is-8 is-offset-2">
+            <div class="level">
+                <div class="level-left">
+                    <a class="button is-outlined" href="{% url 'inscricoes:consultar-inscricao' inscricao.pk %}">
+                        <span class=" icon is-small"><i class="mdi mdi-chevron-left"></i></span>
+                        <span>Consultar ou Alterar Inscrição</span>
+                    </a>
+                </div>
+                <div class="level-right">
+                    <a class="button is-success is-outlined" href="{% url 'home' %}">
+                        <span>Página Inicial</span>
+                        <span class="icon"><i class="mdi mdi-home"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

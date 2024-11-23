@@ -1,0 +1,204 @@
+{% extends 'app.html' %}
+{% load static %}
+{% block content %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li class="is-active"><a href="" aria-current="page">Atribuir Transporte</a></li>
+  </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+  <form method="POST" action="">
+    {% csrf_token %}
+  <div class="b-steps">
+    <section class="step-content">
+        <div class="step-item">
+			<div style="padding: 1rem 2vw 0px">
+
+              <hr>
+              <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                Informação de  Transporte
+              </h2>
+              
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <strong>Identificador:</strong>
+                    <div class="control">
+                      {{transporte.transporte.identificador}} 
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="column">
+                  <div class="field">
+                    <strong>Origem/Destino:</strong>
+                    <div class="control">
+                      {{transporte.trip}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <strong>Dia:</strong>
+                    <div class="control">
+                      {{transporte.transporte.dia}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <strong>Horario:</strong>
+                    <div class="control">
+                      {{transporte.horaPartida}}&nbsp;-&nbsp;{{transporte.horaChegada}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <strong>Vagas/Capacidade:</strong>
+                    <div class="control">
+                        {{vagas}}/{{transporte.transporte.transporteuniversitario.capacidade}}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              	<hr>
+                <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                Tabela de Atribuição
+              </h2>
+               <div class="table ">
+                  <div class="table-wrapper">
+                      <table class="table has-mobile-cards is-hoverable">
+                          <thead>
+                              <tr>
+                                  <th  style="width: 300px;">
+                                      <div class="th-wrap">
+                                           Grupo
+                                          <span class="icon is-small">
+                                              <i class="mdi mdi-menu-up"></i>
+                                          </span>
+                                      </div>
+                                  </th>
+                                  <th  style="width: 300px;">
+                                      <div class="th-wrap">
+                                           Nº Pessoas
+                                          <span class="icon is-small">
+                                              <i class="mdi mdi-menu-up"></i>
+                                          </span>
+                                      </div>
+                                  </th>
+                                  <th  style="width: 300px;">
+                                      <div class="th-wrap">
+                                           Operação
+                                          <span class="icon is-small">
+                                              <i class="mdi mdi-menu-up"></i>
+                                          </span>
+                                      </div>
+                                  </th>
+                                  <th style=""></th>
+                              </tr>
+                          </thead>
+                          <tbody>    
+                              {% for insctransporte in inscricoestransporte %} 
+                              <tr id="sessao.id" draggable="false">
+                                  <td data-label="Grupo">{{insctransporte.inscricao.id}}</td>
+                                  <td data-label="Npassageiros">{{insctransporte.npassageiros}}</td>  
+                                  <td>
+                                    <a onclick="alert.render('Tem a certeza que deseja eliminar este grupo?','{% url 'configuracao:eliminarAtribuicao' insctransporte.id %}')">
+                                          <span class="icon has-text-danger">
+                                              <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                          </span>
+                                    </a>
+                                  </td>
+                              </tr>
+                              {% endfor %} 
+                          </tbody>
+                      </table>
+                  </div>
+                        </div>
+                        <hr/>
+				<h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+					Atribuir Transporte
+				</h2>
+        <div class="columns">
+          <div class="column is-9">
+                <div class="field">
+                <label class="label"><strong>Grupos:</strong></label>
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            <select id="gruposid" name="gruposid" required>
+                                <option value="">---------</option>
+                                  {% for cp in chegadapartida %}
+                                      {% if cp.check == 1 %}
+                                        <option  value="{{cp.id}}" >Grupo: {{cp.id}}&nbsp&nbsp&nbsp Local do destino: {{cp.local}} &nbsp&nbsp&nbsp Fim da ultima Sessao: {{cp.horario}}&nbsp&nbsp&nbsp Numero de Pesssoas: {{cp.nparticipantes}} </option>
+                                      {% endif %}
+                                      {% if cp.check == 0 %}
+                                         <option  value="{{cp.id}}" >Grupo: {{cp.id}}&nbsp&nbsp&nbsp Local de chegada a Faro: {{cp.local}} &nbsp&nbsp&nbsp Chegada a Faro: {{cp.horario}} &nbsp&nbsp&nbsp Numero de Pesssoas: {{cp.nparticipantes}} </option>
+                                      {% endif %}
+                                    {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+          </div>
+          <div class="column is-1">
+                        <div class="field" >
+                        <label class="label"></label>
+                        <br>
+                          <div class="control">
+                            <div class="has-text-centered">
+                                <button class="button is-success" name="new" value="New">
+                                    <span class="icon is-small">
+                                        <i class="mdi mdi-plus"></i>
+                                    </span>
+                                    <span>Adicionar Grupo</span>
+                                </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+        </div>
+      </div>
+      <hr>
+      <br>
+    </section>
+    <div class="column is-8 is-offset-2">
+      <div class="level">
+        <div class="level-left">
+          <a class="button is-medium is-outlined" type="button" href="{% url 'configuracao:verTransportes' %}">
+            <span>Cancelar</span>
+          </a>
+        </div>
+        <div class="level-right">
+          <a class="button is-medium is-success is-outlined is-link" href="{% url 'configuracao:verTransportes' %}">
+            <span>Confirmar</span>
+            <span class="icon is-medium">
+              <i class="mdi mdi-check mdi-36px"></i>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+
+<style>
+  .label {
+  font-weight: normal;
+}
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+{% endblock content %}
+{% block scripts %}
+<script>
+</script>
+{% endblock scripts %}

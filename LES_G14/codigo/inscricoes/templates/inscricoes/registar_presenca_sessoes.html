@@ -1,0 +1,111 @@
+
+{% extends 'app.html' %}
+{% load static %}
+
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+
+<style>
+    .table.is-hoverable tbody>tr:not(.is-selected):not(.detail):hover {
+        cursor: pointer;
+    }
+
+    .label {
+        font-weight: normal;
+    }
+
+    .menu-list .is-not-menu a.is-active {
+        background-color: white;
+        color: black;
+    }
+
+    ::placeholder {
+        opacity: 1;
+    }
+</style>
+{%if not presenca%}
+{{ wizard.form.media }}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/axios.js' %}"></script>
+<script src="{% static 'js/buefy/components/table/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/numberinput/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/datepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/select/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/input/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/menu/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/icon/index.min.js' %}"></script>
+
+
+<h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+    Sessões Escolhidas <abbr
+        title="Aqui pode consultar a lista das sessões que escolheu inscrever-se. Se pretender remover a inscrição clique na cruz vermelha à direita da sessão."><span
+            class="icon" style="font-size: 1rem"><i class="mdi mdi-help-circle"></i></span></abbr>
+</h2>
+<!-- TABELA ESCOLHIDAS -->
+<b-table :data="sessoesEscolhidas" sort-icon="menu-up" default-sort="sessao.horario.inicio">
+    <template slot-scope="props">
+        <b-table-column field="sessao.horario.inicio" label="Horário" sortable>
+            [[ moment(props.row.sessao.horario.inicio, "HH:mm:ss").format("HH:mm") ]] -
+            [[ moment(props.row.sessao.horario.fim, "HH:mm:ss").format("HH:mm") ]]</b-table-column>
+        <b-table-column label="Inscritos">
+            <b-field>
+                <b-numberinput v-model="inscritos[props.row.sessao.id]" min="0"
+                    :max="Math.min(props.row.sessao.vagas, nalunos)" style="width: 10rem"
+                    controls-position="compact"
+                    @blur="mudarInscritos(props.row.atividade, props.row.sessao)" />
+            </b-field>
+        </b-table-column>
+        <b-table-column field="atividade.nome" label="Atividade">
+            [[ props.row.atividade.nome ]]
+        </b-table-column>
+        <b-table-column field="atividade.sala" label="Sala">
+            <span v-html="props.row.atividade.sala"></span>
+        </b-table-column>
+        <b-table-column label="Ações" centered>
+            <a
+                @click="inscritos[props.row.sessao.id] = 0; mudarInscritos(props.row.atividade, props.row.sessao)">
+                <b-icon icon="close-box" type="is-danger" /></a>
+        </b-table-column>
+    </template>
+    <template slot="empty">
+        <p class="has-text-grey">Ainda não há sessões escolhidas</p>
+    </template>
+</b-table>
+{% if form.non_field_errors %}
+<div style="margin: 20px 20px; text-align: center;">
+    <div class="message is-danger">
+        <div class="message-body">
+            {{ form.non_field_errors }}
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr />
+<div class="column is-8 is-offset-2">
+    <div class="level">
+        <div class="level-left">
+            {% if wizard.steps.prev %}
+            <button class="button is-outlined" formnovalidate="formnovalidate" name="wizard_goto_step"
+                value="{{ wizard.steps.prev }}">
+                <span class=" icon is-small"><i class="mdi mdi-chevron-left"></i></span>
+                <span>Anterior</span>
+            </button>
+            {% endif %}
+        </div>
+        <div class="level-right">
+            <button type="submit" class="button is-success is-outlined">
+                <span>Submeter</span>
+                <span class="icon"><i class="mdi mdi-check"></i></span>
+            </button>
+        </div>
+    </div>
+</div>

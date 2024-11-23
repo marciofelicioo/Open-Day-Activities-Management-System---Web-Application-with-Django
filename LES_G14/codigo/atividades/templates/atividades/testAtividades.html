@@ -1,0 +1,581 @@
+{% extends 'app.html' %}
+{% block content %}
+{% load atividadestags %}
+<form method="POST" action="" id='frm'>
+<div id="id_removed_rows" style="display:none;"></div>
+<div id="proporatividade" style="display: content">
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    <li><a href="{% url 'atividades:minhasAtividades' %}">Minhas Atividades</a></li>
+    <li class="is-active"><a href="" aria-current="page">Atividade</a></li>
+  </ul>
+</nav>
+<div style="padding: 3rem 2vw 1rem">
+         <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-flask mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Atividade</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-calendar-check mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Sessoes</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+            <section class="step-content">
+                <div class="step-item">
+                    <div style="padding: 1rem 2vw 0px">
+                        <hr>
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                        Informação de atividade
+                        </h2>
+                        <div class="columns">
+                        <div class="column">
+                        
+                            <div class="field">
+                            <label class="label">Nome da Atividade</label>
+                            <div class="control">
+                                {{form.nome}}
+                            </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                            <label class="label">Tipo de Atividade</label>
+                            <div class="control is-expanded">
+                                <div class="select is-fullwidth">
+                                {{form.tipo}}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                            <label class="label">Descrição</label>
+                            <div class="control">
+                                {{form.descricao}}
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                <label class="label">Público Alvo</label>
+                                    <div class="control">
+                                    <div class="select is-fullwidth">
+                                        {{form.publicoalvo}}
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                <label class="label">Tema</label>
+                                    <div class="control">
+                                    <div class="select is-fullwidth">
+                                        {{form.tema}}
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem">
+                            Requisitos de Atividade
+                        </h2>
+                        <div class="columns">
+                            <div class="column ">
+                                <div class="field">
+                                <label class="label">Duração Esperada</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{form.duracaoesperada}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                <label class="label">Colaboradores Necessarios</label>
+                                    <div class="control">
+                                    {{form.nrcolaboradoresnecessario}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                <label class="label">Número de Participantes</label>
+                                    <div class="control">
+                                    {{form.participantesmaximo}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-2">
+                                <div class="field">
+                                <label class="label">Campus</label>
+                                    <div class="control is-expanded">
+                                        <div class="select is-fullwidth">
+                                            <select id="campusid" name="campusid">
+                                                {% if espaco %}
+                                                    <option selected value="{{espaco.edificio.campus.id}}">{{espaco.edificio.campus.nome}}</option>
+                                                {% else %}
+                                                    <option selected value="">---------</option>
+                                                {% endif %}
+                                                {% for c in campus %}
+                                                    <option  value="{{c.id}}" >{{c.nome}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-2">
+                                <div class="field">
+                                <label class="label">Edificio</label>
+                                    <div class="control is-expanded">
+                                        <div class="select is-fullwidth">
+                                            <select id="edificioid" name="edificioid">
+                                                {% if espaco %}
+                                                    <option selected value="{{espaco.edificio.id}}">{{espaco.edificio.nome}}</option>
+                                                    {% for edi in edificios %}
+                                                        <option  value="{{edi.id}}" >{{edi.nome}}</option>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <option value="">---------</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column is-2"></div>
+                            <div class="column is-6">
+                                <div class="field">
+                                <label class="label">Materiais Extra Necessarios</label>
+                                    <div class="control">
+                                    {{materiais.nomematerial}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-2">
+                                <div class="field">
+                                <label class="label">Sala</label>
+                                    <div class="control is-expanded">
+                                        <div class="select is-fullwidth">
+                                            <select id="espacoid" name="espacoid" required>
+                                               {% if espaco %}
+                                                <option selected value="{{espaco.id}}">{{espaco.nome}}</option>
+                                                {% for esp in espacos %}
+                                                    <option  value="{{esp.id}}" >{{esp.nome}}</option>
+                                                {% endfor %}
+                                                {% else %}
+                                                <option value="">---------</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="column is-8 is-offset-2">
+          <div class="level">
+            <div class="level-left">
+              <a href="javascript:history.back()" class="button is-medium is-outlined" type="button">
+                <span>Cancelar</span>
+              </a>
+            </div>
+            <div class="level-right">
+              <a id='toValidate' type="button" role="button" class="button is-medium is-success is-outlined is-link" name="proximo" value="proximo">
+                <span>Próximo</span>
+                <span class="icon is-medium">
+                  <i class="mdi mdi-forward mdi-36px"></i>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+  </div>
+</div>
+
+<div id="inserirsessao"  style="display: none">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><a href="{% url 'home' %}">Início</a></li>
+        <li><a href="{% url 'atividades:minhasAtividades' %}">Minhas Atividades</a></li>
+        <li class="is-active"><a href="" aria-current="page"> Sessoes</a></li>
+    </ul>
+    </nav>
+    <div style="padding: 3rem 2vw 1rem">
+   <div style="padding: 3rem 2vw 1rem;">
+
+        <div class="steps is-success">
+
+            <div class="step-item is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-flask mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Atividade</p>
+
+                </div>
+
+            </div>
+
+            <div class="step-item  is-completed is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-calendar-check mdi-22px"></i>
+
+                    </span>
+
+                </div>
+
+                
+
+                <div class="step-details">
+
+                    <p class="step-title">Sessoes</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="step-item is-success">
+
+                <div class="step-marker">
+
+                    <span class="icon">
+
+                        <i class="mdi mdi-check"></i>
+
+                    </span>
+
+                </div>
+
+                <div class="step-details">
+
+                    <p class="step-title">Concluir</p>
+
+                </div>
+
+            </div>
+
+        </div>
+    <section class="step-content">
+        <div class="step-item">
+          <div style="padding: 1rem 2vw 0px;">
+            <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Minhas Sessoes</h2>
+
+            <div class="table ">
+                            <div class="table-wrapper">
+                                <table class="table has-mobile-cards is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                     Dia
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th  style="width: 300px;">
+                                                <div class="th-wrap">
+                                                     Horário
+                                                    <span class="icon is-small">
+                                                        <i class="mdi mdi-menu-up"></i>
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th style=""></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>    
+                                        {% for sessao in sessions_activity %} 
+                                        <tr id="sessao.id" draggable="false">
+                                            <td data-label="Dia">{{sessao.dia}}</td>
+                                            <td data-label="Nome">{{sessao.horarioid.inicio}}</td> 
+                                            <td>
+                                               <a onclick="alert.render('Tem a certeza que deseja eliminar a sessão?','{% url 'atividades:eliminarSessao' sessao.id%}')">
+                                                    <span class="icon has-text-danger">
+                                                        <i class="mdi mdi-trash-can-outline mdi-24px"></i>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr/>
+            <h2 class="title has-text-grey is-uppercase" style="font-size: 0.9rem; margin-bottom: 2rem;">Adicionar Sessao</h2>
+            <div class="columns">
+                    <div class="column is-2">
+                      <div class="field" >
+                        <label class="label">Dia</label>
+                        <div class="control">
+                          <div class="select is-fullwidth" >
+                            <select id="diasessao" name="diasessao">
+                              <option value="">Escolha um dia</option>
+                              {% for dia in dias %}
+                              <option value="{{dia|date:'Y-m-d'}}">{{dia}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                      <div class="column is-2">
+                      <div class="field" >
+                        <label class="label">Horário</label>
+                        <div class="control">
+                          <div class="select is-fullwidth" >
+                            <select id="horarioid" name="horarioid">
+                              <option value="">---------</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="column is-1">
+                        <div class="field" >
+                        <label class="label"></label>
+                        <br>
+                          <div class="control">
+                            <div class="has-text-centered">
+                                <button class="button is-success" name="new" value="new">
+                                    <span class="icon is-small">
+                                        <i class="mdi mdi-plus"></i>
+                                    </span>
+                                    <span>Adicionar Sessão</span>
+                                </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+        <hr>
+        </div>     
+    </section>
+    <div class="column is-8 is-offset-2">
+      <div class="level">
+      <div class="level-left">
+         <a  class="button is-medium is-outlined" onclick="myFunction()">
+            <span class="icon is-medium">
+              <i class="mdi fa fa-arrow-left mdi-36px"></i>
+            </span>
+            <span>Anterior</span>
+         </a>
+      </div>
+      <div class="level-right">
+        <a  class="button is-success is-medium is-outlined is-link" onclick="alert.warning('A Atividade não pode ser criada sem sessoes !')">
+            <span>Proximo</span>
+            <span class="icon is-medium">
+              <i class="mdi mdi-forward mdi-36px"></i>
+            </span>
+        </a>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+</div>
+{% csrf_token %}
+{% include 'popup.html' %}
+</form>
+
+
+
+<style>
+  .label {
+  font-weight: normal;
+  }
+.b-steps .steps .step-items .step-item .step-details .step-title {
+  font-size: 1rem;
+}
+</style>
+<style>
+    .dialog .modal-card .modal-card-body.is-titleless {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+</style>
+
+{% endblock content %}
+{% block scripts %}
+
+<script>
+
+    $('#toValidate').click(function(e){
+    if ($("#frm")[0].checkValidity()) {
+        console.log('vald')
+        $('#proporatividade').hide();
+        $('#inserirsessao').show();
+    } else
+        $("#frm")[0].reportValidity()
+
+  //if you've gotten here - play on playa'
+});
+
+    $("#campusid").change(function()
+    {
+        var valuecampus= $(this).val();
+        $.ajax({
+            url:"{% url 'atividades:verEdificios' %}",
+            method: 'POST',
+            data: { 
+                'valuecampus': valuecampus,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function(data){
+                $("#edificioid").html(data)
+                $("#espacoid").html('<option value="">---------</option>');
+            }
+
+        })
+
+    })
+
+    $("#edificioid").change(function()
+    {
+        var valueedificio= $(this).val();
+        $.ajax({
+            url:"{% url 'atividades:verSalas' %}",
+            method: 'POST',
+            data: { 
+                'valueedificio': valueedificio,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function(data){
+                $("#espacoid").html(data)
+            }
+
+        })
+
+    })
+
+     $("#diasessao").change(function()
+    {
+        var id= "{{id}}"
+        console.log(id)
+        var valuedia= $(this).val();
+        $.ajax({
+            url:"{% url 'atividades:verHorarios'%}",
+            method: 'POST',
+            data: { 
+                'valuedia': valuedia,
+                'id': id,
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function(data){
+                $("#horarioid").html(data)
+            }
+
+        })
+
+    })    
+
+    function myFunction() {
+    var x = document.getElementById("proporatividade");
+    var x2 = document.getElementById("inserirsessao");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+      x2.style.display = "none";
+    } else {
+      x.style.display = "none";
+      x2.style.display = "block";
+    }
+}
+    
+</script>
+{% endblock scripts %}
+

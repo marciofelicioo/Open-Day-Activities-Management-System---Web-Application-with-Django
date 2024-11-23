@@ -1,0 +1,20 @@
+<tr>
+  <input type="hidden" name="{{form_id}}" id="id_{{form_id}}">
+  <td data-label="Prato">
+      <input type="text" name="{{form_prato}}" class="input" maxlength="255" id="id_{{form_prato}}" required>
+  </td>
+  <td data-label="Tipo">
+      <span class="select is-fullwidth is-empty">
+        <select name="{{form_tipo}}" class="input" id="id_{{form_tipo}}" required>
+          <option value="" selected="">---------</option>
+          <option value="Peixe">Peixe</option>
+          <option value="Vegetariano">Vegetariano</option>
+          <option value="Carne">Carne</option>
+          <option value="Sobremesa">Sobremesa</option>
+          </select>
+      </span>
+  </td>
+  <td data-label="# Pratos">
+      <input type="number" name="{{form_num}}" class="input" min="1" style="width: 30%" id="id_{{form_num}}" required>
+  </td>
+</tr>

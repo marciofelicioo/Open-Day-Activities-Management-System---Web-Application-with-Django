@@ -1,0 +1,71 @@
+{% extends 'app.html' %}
+{% load static %}
+
+{% block load %}
+<link rel="stylesheet" href="{% static 'css/buefy.css' %}">
+<link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/vue-dev.js' %}"></script>
+<script src="{% static 'js/moment.js' %}"></script>
+<script src="{% static 'js/buefy/components/table/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/select/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/radio/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/timepicker/index.min.js' %}"></script>
+<script src="{% static 'js/buefy/components/field/index.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+    input[type="checkbox"] {
+        -webkit-appearance: checkbox;
+        -moz-appearance: checkbox;
+        appearance: checkbox;
+    }
+    input, button {
+        margin-bottom: 1rem; /* Adiciona espaço abaixo dos inputs e botão */
+    }
+    .box {
+        padding: 2rem; /* Espaço interno da caixa do formulário */
+        margin-top: 2rem; /* Espaço acima da caixa do formulário */
+    }
+    </style>
+<div class="container">
+    <h2>{{ presenca_registrada|yesno:"Alterar Presença,Marcar Presença" }}</h2>
+    <form method="post" class="box">
+        {% csrf_token %}
+        <div class="field">
+            <label class="label">Número de Participantes desta Inscrição</label>
+            <input type="text" class="input" value="{{ inscricao.nalunos }}" readonly>
+        </div>
+        <div class="field">
+    <label class="label" for="{{ form.nr_presentes.id_for_label }}">Número de Participantes Presentes</label>
+    <div class="control">
+        <input type="text" class="input" name="nr_presentes" value="{{ nr_presentes }}">
+    </div>
+</div>
+        <div class="field is-grouped">
+            <div class="control">
+                <button type="submit" class="button is-link">{{ presenca_registrada|yesno:"Atualizar Presença,Registrar Presença" }}</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+<style>
+input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    appearance: checkbox;
+}
+input, button {
+    margin-bottom: 1rem; /* Adiciona espaço abaixo dos inputs e botão */
+}
+.box {
+    padding: 2rem; /* Espaço interno da caixa do formulário */
+    margin-top: 2rem; /* Espaço acima da caixa do formulário */
+}
+</style>
